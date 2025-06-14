@@ -35,10 +35,13 @@ typedef struct
         {
             // Implement this
         } query_reply_info;
-        
-        
     };
 } Capsule_st;
+
+typedef Capsule_st* Capsule;
+
+Capsule createCapsule();
+void freeCapsule(Capsule capsule);
 
 
 #endif
