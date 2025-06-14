@@ -12,6 +12,13 @@ typedef enum
     BLUEGRAPH_CAPSULE_TYPE_QUERY_REPLY      // Reply to the query
 } CapsuleType;
 
+typedef enum
+{
+    BLUEGRAPH_MESSAGE_TYPE_TEXT,
+    BLUEGRAPH_MESSAGE_TYPE_MEDIA,
+    BLUEGRAPH_MESSAGE_TYPE_FILE
+} MessageType;
+
 typedef struct
 {
     CapsuleType type;
@@ -19,8 +26,9 @@ typedef struct
     {
         struct
         {
+            MessageType messageType;
             char* msg;
-            size_t msglen;
+            size_t msgLen;
         } send_message_info;
         struct
         {
