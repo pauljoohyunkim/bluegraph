@@ -105,3 +105,30 @@ void startServer()
     close(s);
     return 0;
 }
+
+// TODO: Change hexaddress to something else that is more sensible.
+void clientConnect(const char *hexaddress, const char *msg)
+{
+    struct sockaddr_rc addr = {0};
+    int s, status;
+    char *dest = hexaddress;
+
+    // allocate a socket
+    s = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
+    // set the connection parameters (who to connect to)
+    addr.rc_family = AF_BLUETOOTH;
+    addr.rc_channel = (uint8_t) BLUEGRAPH_DEFAULT_PORT;
+    str2ba(dest, &addr.rc_bdaddr);
+    
+    status = connect(s, (struct sockaddr *)&addr, sizeof(addr));
+    // send a message
+    if (status == 0)
+    {
+        // TODO: send msg instead
+        status = write(s, "hello!", 6);
+    }
+    if (status < 0)
+        perror("uh oh");
+    close(s);
+    return 0;
+}
