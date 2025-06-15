@@ -10,6 +10,7 @@ typedef struct
 typedef BluegraphDevice_st *BluegraphDevice;
 
 BluegraphDevice *discoverDevices(int len, int *nDevices);
+void freeBluegraphDevices(BluegraphDevice *devices, int nDevices);
 
 #define MAX_BLUETOOTH_DISCOVERY_DEVICE_NUMBER 255
 

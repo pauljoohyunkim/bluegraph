@@ -3,5 +3,8 @@
 int main()
 {
     int nDevices = 0;
-    discoverDevices(5, &nDevices);
+    BluegraphDevice *devices = discoverDevices(5, &nDevices);
+
+    freeBluegraphDevices(devices, nDevices);
+    return 0;
 }
