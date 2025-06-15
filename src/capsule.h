@@ -3,10 +3,12 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
+#include <cjson/cJSON.h>
 
 typedef enum
 {
-    BLUEGRAPH_CAPUSLE_TYPE_SEND_MESSAGE,    // Sending message
+    BLUEGRAPH_CAPSULE_TYPE_SEND_MESSAGE,    // Sending message
     BLUEGRAPH_CAPSULE_TYPE_SEND_RECEIPT,    // Acknowledgment of receiving message
     BLUEGRAPH_CAPSULE_TYPE_QUERY,           // Querying if node can reach destination.
     BLUEGRAPH_CAPSULE_TYPE_QUERY_REPLY      // Reply to the query
@@ -26,6 +28,7 @@ typedef struct
     {
         struct
         {
+            bool isFinalChunk;
             MessageType messageType;
             char* msg;
             size_t msgLen;
@@ -51,5 +54,7 @@ typedef Capsule_st* Capsule;
 Capsule createCapsule();
 void freeCapsule(Capsule capsule);
 
+cJSON* capsule2json(Capsule capsule);
+Capsule json2capsule(cJSON* json);
 
 #endif
