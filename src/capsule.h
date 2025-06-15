@@ -8,10 +8,11 @@
 
 typedef enum
 {
-    BLUEGRAPH_CAPSULE_TYPE_SEND_MESSAGE,    // Sending message
-    BLUEGRAPH_CAPSULE_TYPE_SEND_RECEIPT,    // Acknowledgment of receiving message
-    BLUEGRAPH_CAPSULE_TYPE_QUERY,           // Querying if node can reach destination.
-    BLUEGRAPH_CAPSULE_TYPE_QUERY_REPLY      // Reply to the query
+    BLUEGRAPH_CAPSULE_TYPE_SEND_MESSAGE_REQUEST,    // Request to send message.
+    BLUEGRAPH_CAPSULE_TYPE_SEND_MESSAGE_DATA,       // Data of message.
+    BLUEGRAPH_CAPSULE_TYPE_SEND_RECEIPT,            // Acknowledgment of receiving message
+    BLUEGRAPH_CAPSULE_TYPE_QUERY,                   // Querying if node can reach destination.
+    BLUEGRAPH_CAPSULE_TYPE_QUERY_REPLY              // Reply to the query
 } CapsuleType;
 
 typedef enum
@@ -28,11 +29,14 @@ typedef struct
     {
         struct
         {
-            bool isFinalChunk;
             MessageType messageType;
-            char* msg;
             size_t msgLen;
-        } send_message_info;
+        } send_message_request_info;
+        struct
+        {
+            bool isFinalChunk;
+            char *msg;
+        } send_message_data_info;
         struct
         {
             // Implement this
@@ -53,8 +57,5 @@ typedef Capsule_st* Capsule;
 
 Capsule createCapsule();
 void freeCapsule(Capsule capsule);
-
-cJSON* capsule2json(Capsule capsule);
-Capsule json2capsule(cJSON* json);
 
 #endif
