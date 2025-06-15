@@ -74,5 +74,37 @@ Packet capsule2packet(Capsule capsule, size_t *pSize)
 
 Capsule packet2capsule(Packet packet, size_t size)
 {
+    Capsule capsule = calloc(1, sizeof(Capsule_st));
+    size_t index = 0;
+    uint8_t c = 0;
+    if (!capsule) return NULL;
 
+    c = packet[index];
+    index += sizeof(uint8_t);
+    switch ((CapsuleType) c)
+    {
+        case BLUEGRAPH_CAPSULE_TYPE_SEND_MESSAGE_REQUEST:
+            capsule->send_message_request_info.messageType = (MessageType) packet[index];
+            index += sizeof(uint8_t);
+            capsule->send_message_request_info.msgLen = (uint64_t) be64toh(*((uint64_t*) (packet + index)));
+            index += sizeof(uint64_t);
+            break;
+        case BLUEGRAPH_CAPSULE_TYPE_SEND_MESSAGE_DATA:
+            capsule->send_message_data_info.isFinalChunk = (bool) packet[index];
+            index += sizeof(uint8_t);
+            capsule->send_message_data_info.msgLen = (uint64_t) be64toh(*((uint64_t*) (packet + index)));
+            index += sizeof(uint64_t);
+            capsule->send_message_data_info.msg = calloc(capsule->send_message_data_info.msgLen, sizeof(uint8_t));
+            memcpy(capsule->send_message_data_info.msg, packet + index, capsule->send_message_data_info.msgLen);
+            index += capsule->send_message_data_info.msgLen;
+            break;
+        case BLUEGRAPH_CAPSULE_TYPE_SEND_RECEIPT:
+            break;
+        case BLUEGRAPH_CAPSULE_TYPE_QUERY:
+            break;
+        case BLUEGRAPH_CAPSULE_TYPE_QUERY_REPLY:
+            break;
+    }
+
+    return capsule;
 }

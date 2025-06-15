@@ -14,8 +14,11 @@ void sendMessageRequestInfo()
 
     Packet packet = capsule2packet(capsule, &packet_length);
     
-    free(packet);
     freeCapsule(capsule);
+
+    capsule = packet2capsule(packet, packet_length);
+    freeCapsule(capsule);
+    free(packet);
 }
 
 void sendMessageDataInfo()
