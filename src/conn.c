@@ -103,7 +103,6 @@ void startServer()
     // close connection
     close(client);
     close(s);
-    return 0;
 }
 
 // TODO: Change hexaddress to something else that is more sensible.
@@ -130,5 +129,4 @@ void clientConnect(const char *hexaddress, const char *msg)
     if (status < 0)
         perror("uh oh");
     close(s);
-    return 0;
 }
