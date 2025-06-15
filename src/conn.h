@@ -9,9 +9,16 @@ typedef struct
 
 typedef BluegraphDevice_st *BluegraphDevice;
 
+// Discovery
 BluegraphDevice *discoverDevices(int len, int *nDevices);
 void freeBluegraphDevices(BluegraphDevice *devices, int nDevices);
 
+// Server
+void startServer();
+
 #define MAX_BLUETOOTH_DISCOVERY_DEVICE_NUMBER 255
+
+// TODO: This shall be updated
+#define BLUEGRAPH_DEFAULT_PORT 5
 
 #endif

@@ -3,6 +3,7 @@
 #include <bluetooth/bluetooth.h>
 #include <bluetooth/hci.h>
 #include <bluetooth/hci_lib.h>
+#include <bluetooth/rfcomm.h>
 #include "conn.h"
 
 // Creates List of BluegraphDevice
@@ -70,4 +71,37 @@ void freeBluegraphDevices(BluegraphDevice *devices, int nDevices)
         free(devices[i]);
     }
     free(devices);
+}
+
+void startServer()
+{
+    struct sockaddr_rc loc_addr = {0}, rem_addr = {0};
+    char buf[1024] = {0};
+    int s, client, bytes_read;
+    int opt = sizeof(rem_addr);
+    
+    s = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
+
+    // Bluetooth adapter
+    loc_addr.rc_family = AF_BLUETOOTH;
+    loc_addr.rc_bdaddr = *BDADDR_ANY;
+    loc_addr.rc_channel = (uint8_t) BLUEGRAPH_DEFAULT_PORT;
+    bind(s, (struct sockaddr *)&loc_addr, sizeof(loc_addr));
+    listen(s, 1);
+    
+    // TODO: while loop to accept connections
+    client = accept(s, (struct sockaddr *)&rem_addr, &opt);
+    ba2str(&rem_addr.rc_bdaddr, buf);
+    fprintf(stderr, "accepted connection from %s\n", buf);
+    memset(buf, 0, sizeof(buf));
+    
+    bytes_read = read(client, buf, sizeof(buf));
+    if (bytes_read > 0)
+    {
+        printf("received [%s]\n", buf);
+    }
+    // close connection
+    close(client);
+    close(s);
+    return 0;
 }
