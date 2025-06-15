@@ -89,7 +89,6 @@ void startServer()
     bind(s, (struct sockaddr *)&loc_addr, sizeof(loc_addr));
     listen(s, 1);
     
-    // TODO: while loop to accept connections
     while (1)
     {
         client = accept(s, (struct sockaddr *)&rem_addr, &opt);
@@ -103,30 +102,29 @@ void startServer()
             printf("received [%s]\n", buf);
         }
     }
-    // close connection
+    
     close(client);
     close(s);
 }
 
-// TODO: Change hexaddress to something else that is more sensible.
-void clientConnect(const char *hexaddress, const char *msg)
+// TODO: In the msg, there will be a flag encoded such that
+// the segment sent is the last chunk.
+void clientConnect(const char *serverAddress, const char *msg)
 {
     struct sockaddr_rc addr = {0};
     int s, status;
-    char *dest = hexaddress;
 
     // allocate a socket
     s = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
     // set the connection parameters (who to connect to)
     addr.rc_family = AF_BLUETOOTH;
     addr.rc_channel = (uint8_t) BLUEGRAPH_DEFAULT_PORT;
-    str2ba(dest, &addr.rc_bdaddr);
+    str2ba(serverAddress, &addr.rc_bdaddr);
     
     status = connect(s, (struct sockaddr *)&addr, sizeof(addr));
     // send a message
     if (status == 0)
     {
-        // TODO: send msg instead
         status = write(s, msg, strlen(msg));
     }
     if (status < 0)
