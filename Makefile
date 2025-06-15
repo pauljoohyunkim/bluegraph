@@ -1,6 +1,6 @@
 CC=gcc
 CFLAGS=-g -Wall
-LDFLAGS=-lbluetooth -lcjson
+LDFLAGS=-lbluetooth
 
 test/discoverytest: test/discoverytest.c src/conn.c
 	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)

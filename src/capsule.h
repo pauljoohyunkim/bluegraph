@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-#include <cjson/cJSON.h>
+#include <stdint.h>
 
 typedef enum
 {
@@ -30,11 +30,12 @@ typedef struct
         struct
         {
             MessageType messageType;
-            size_t msgLen;
+            uint64_t msgLen;
         } send_message_request_info;
         struct
         {
             bool isFinalChunk;
+            uint64_t msgLen;
             char *msg;
         } send_message_data_info;
         struct
@@ -53,9 +54,13 @@ typedef struct
     };
 } Capsule_st;
 
-typedef Capsule_st* Capsule;
+typedef Capsule_st *Capsule;
+typedef uint8_t *Packet;
 
 Capsule createCapsule();
 void freeCapsule(Capsule capsule);
+
+Packet capsule2packet(Capsule capsule, size_t *pSize);
+Capsule packet2capsule(Packet packet, size_t size);
 
 #endif
