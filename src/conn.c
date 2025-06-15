@@ -90,15 +90,18 @@ void startServer()
     listen(s, 1);
     
     // TODO: while loop to accept connections
-    client = accept(s, (struct sockaddr *)&rem_addr, &opt);
-    ba2str(&rem_addr.rc_bdaddr, buf);
-    fprintf(stderr, "accepted connection from %s\n", buf);
-    memset(buf, 0, sizeof(buf));
-    
-    bytes_read = read(client, buf, sizeof(buf));
-    if (bytes_read > 0)
+    while (1)
     {
-        printf("received [%s]\n", buf);
+        client = accept(s, (struct sockaddr *)&rem_addr, &opt);
+        ba2str(&rem_addr.rc_bdaddr, buf);
+        fprintf(stderr, "accepted connection from %s\n", buf);
+        memset(buf, 0, sizeof(buf));
+
+        bytes_read = read(client, buf, sizeof(buf));
+        if (bytes_read > 0)
+        {
+            printf("received [%s]\n", buf);
+        }
     }
     // close connection
     close(client);
@@ -124,7 +127,7 @@ void clientConnect(const char *hexaddress, const char *msg)
     if (status == 0)
     {
         // TODO: send msg instead
-        status = write(s, "hello!", 6);
+        status = write(s, msg, strlen(msg));
     }
     if (status < 0)
         perror("uh oh");
