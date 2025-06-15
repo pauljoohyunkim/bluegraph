@@ -2,7 +2,7 @@
 
 int main()
 {
-    const serveraddress = "XX:XX:XX:XX:XX:XX";
+    const char *serveraddress = "XX:XX:XX:XX:XX:XX";
     clientConnect(serveraddress, "Hello World");
     return 0;
 }
