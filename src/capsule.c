@@ -12,6 +12,10 @@ Capsule createCapsule()
 
 void freeCapsule(Capsule capsule)
 {
+    if (capsule->type == BLUEGRAPH_CAPSULE_TYPE_SEND_MESSAGE_DATA)
+    {
+        free(capsule->send_message_data_info.msg);
+    }
     free(capsule);
 }
 

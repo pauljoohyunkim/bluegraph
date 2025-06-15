@@ -27,12 +27,17 @@ void sendMessageDataInfo()
     size_t packet_length = 0;
     capsule->type = BLUEGRAPH_CAPSULE_TYPE_SEND_MESSAGE_DATA;
     capsule->send_message_data_info.isFinalChunk = true;
-    capsule->send_message_data_info.msg = "Hello World";
+    capsule->send_message_data_info.msg = calloc(100, sizeof(uint8_t));
+    strcpy(capsule->send_message_data_info.msg, "Hello World");
     capsule->send_message_data_info.msgLen = strlen(capsule->send_message_data_info.msg);
 
     Packet packet = capsule2packet(capsule, &packet_length);
-    free(packet);
+
     freeCapsule(capsule);
+
+    capsule = packet2capsule(packet, packet_length);
+    freeCapsule(capsule);
+    free(packet);
 }
 
 int main()
