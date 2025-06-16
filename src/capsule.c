@@ -69,7 +69,8 @@ Packet capsule2packet(Capsule capsule, size_t *pSize)
             index += sizeof(uint64_t);
             packet[index] = capsule->send_message_request_info.filenameLen;
             index += sizeof(uint8_t);
-            strncpy(packet + index, capsule->send_message_request_info.filename, capsule->send_message_request_info.filenameLen);
+            if (capsule->send_message_request_info.filenameLen > 0)
+                strncpy(packet + index, capsule->send_message_request_info.filename, capsule->send_message_request_info.filenameLen);
             index += capsule->send_message_request_info.filenameLen;
             break;
         case BLUEGRAPH_CAPSULE_TYPE_SEND_MESSAGE_DATA:

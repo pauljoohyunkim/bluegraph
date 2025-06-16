@@ -17,7 +17,7 @@ typedef enum
 typedef enum
 {
     BLUEGRAPH_MESSAGE_SOURCE_BUFFER,
-    BLUEGRAPH_MESSAGE_SOURCE_FILE
+    BLUEGRAPH_MESSAGE_SOURCE_FILENAME
 } MessageSourceType;
 
 typedef struct
@@ -28,7 +28,7 @@ typedef struct
         struct
         {
             MessageSourceType sourceType;
-            void *source;
+            uint8_t *source;
         } send_message_info;
     };
 } Transaction_st;
