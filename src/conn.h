@@ -19,6 +19,7 @@ void startServer();
 void clientConnect(const char *serverAddress, const char *msg);
 
 #define MAX_BLUETOOTH_DISCOVERY_DEVICE_NUMBER 255
+#define BLUEGRAPH_CHUNK_SIZE 1024
 
 // TODO: This shall be updated
 #define BLUEGRAPH_DEFAULT_PORT 5

@@ -36,13 +36,13 @@ typedef struct
         } send_message_request_info;
         struct
         {
+            // TODO: Device Chaining After Query
             bool isFinalChunk;
             uint64_t msgLen;
             uint8_t *msg;
         } send_message_data_info;
         struct
         {
-            // Implement this
             bool ack;
         } send_message_request_ack_info;
         // Implement query
