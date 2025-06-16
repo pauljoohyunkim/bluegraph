@@ -11,6 +11,9 @@ void sendMessageRequestInfo()
     capsule->send_message_request_info.messageType = BLUEGRAPH_MESSAGE_TYPE_FILE;
     char data[] = "Hello World";
     capsule->send_message_request_info.msgLen = strlen(data);
+    capsule->send_message_request_info.filenameLen = 5;
+    capsule->send_message_request_info.filename = calloc(100, sizeof(uint8_t));
+    strcpy(capsule->send_message_request_info.filename, "a.txt");
 
     Packet packet = capsule2packet(capsule, &packet_length);
     

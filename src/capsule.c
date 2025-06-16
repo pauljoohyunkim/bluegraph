@@ -12,9 +12,14 @@ Capsule createCapsule()
 
 void freeCapsule(Capsule capsule)
 {
-    if (capsule->type == BLUEGRAPH_CAPSULE_TYPE_SEND_MESSAGE_DATA)
+    switch (capsule->type)
     {
-        free(capsule->send_message_data_info.msg);
+        case BLUEGRAPH_CAPSULE_TYPE_SEND_MESSAGE_REQUEST:
+            free(capsule->send_message_request_info.filename);
+            break;
+        case BLUEGRAPH_CAPSULE_TYPE_SEND_MESSAGE_DATA:
+            free(capsule->send_message_data_info.msg);
+            break;
     }
     free(capsule);
 }
@@ -33,6 +38,8 @@ Packet capsule2packet(Capsule capsule, size_t *pSize)
         case BLUEGRAPH_CAPSULE_TYPE_SEND_MESSAGE_REQUEST:
             index += sizeof(uint8_t);       // messageType
             index += sizeof(uint64_t);      // msgLen
+            index += sizeof(uint8_t);       // filenameLen
+            index += capsule->send_message_request_info.filenameLen;    // filename
             break;
         case BLUEGRAPH_CAPSULE_TYPE_SEND_MESSAGE_DATA:
             // TODO: For files, the filename should also be included.
@@ -58,6 +65,10 @@ Packet capsule2packet(Capsule capsule, size_t *pSize)
             index += sizeof(uint8_t);
             *((uint64_t*) (packet + index)) = (uint64_t) htobe64(capsule->send_message_request_info.msgLen);
             index += sizeof(uint64_t);
+            packet[index] = capsule->send_message_request_info.filenameLen;
+            index += sizeof(uint8_t);
+            strncpy(packet + index, capsule->send_message_request_info.filename, capsule->send_message_request_info.filenameLen);
+            index += capsule->send_message_request_info.filenameLen;
             break;
         case BLUEGRAPH_CAPSULE_TYPE_SEND_MESSAGE_DATA:
             packet[index] = (uint8_t) capsule->send_message_data_info.isFinalChunk;
@@ -83,9 +94,9 @@ Capsule packet2capsule(Packet packet, size_t size)
     uint8_t c = 0;
     if (!capsule) return NULL;
 
-    c = packet[index];
+    capsule->type = (CapsuleType) packet[index];
     index += sizeof(uint8_t);
-    switch ((CapsuleType) c)
+    switch (capsule->type)
     {
         case BLUEGRAPH_CAPSULE_TYPE_SEND_MESSAGE_REQUEST:
             capsule->send_message_request_info.messageType = (MessageType) packet[index];

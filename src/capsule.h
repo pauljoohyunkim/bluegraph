@@ -31,12 +31,14 @@ typedef struct
         {
             MessageType messageType;
             uint64_t msgLen;
+            uint8_t filenameLen;
+            uint8_t *filename;
         } send_message_request_info;
         struct
         {
             bool isFinalChunk;
             uint64_t msgLen;
-            char *msg;
+            uint8_t *msg;
         } send_message_data_info;
         struct
         {
