@@ -8,11 +8,11 @@
 
 typedef enum
 {
-    BLUEGRAPH_CAPSULE_TYPE_SEND_MESSAGE_REQUEST,    // Request to send message.
-    BLUEGRAPH_CAPSULE_TYPE_SEND_MESSAGE_DATA,       // Data of message.
-    BLUEGRAPH_CAPSULE_TYPE_SEND_RECEIPT,            // Acknowledgment of receiving message
-    BLUEGRAPH_CAPSULE_TYPE_QUERY,                   // Querying if node can reach destination.
-    BLUEGRAPH_CAPSULE_TYPE_QUERY_REPLY              // Reply to the query
+    BLUEGRAPH_CAPSULE_TYPE_SEND_MESSAGE_REQUEST,        // Request to send message.
+    BLUEGRAPH_CAPSULE_TYPE_SEND_MESSAGE_DATA,           // Data of message.
+    BLUEGRAPH_CAPSULE_TYPE_SEND_MESSAGE_REQUEST_ACK,    // Acknowledgement of request to send message.
+    BLUEGRAPH_CAPSULE_TYPE_QUERY,                       // Querying if node can reach destination.
+    BLUEGRAPH_CAPSULE_TYPE_QUERY_REPLY                  // Reply to the query
 } CapsuleType;
 
 typedef enum
@@ -43,7 +43,8 @@ typedef struct
         struct
         {
             // Implement this
-        } send_receipt_info;
+            bool ack;
+        } send_message_request_ack_info;
         // Implement query
         struct
         {

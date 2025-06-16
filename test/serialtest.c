@@ -43,8 +43,24 @@ void sendMessageDataInfo()
     free(packet);
 }
 
+void sendMessageRequestAck()
+{
+    Capsule capsule = createCapsule();
+    size_t packet_length = 0;
+    capsule->type = BLUEGRAPH_CAPSULE_TYPE_SEND_MESSAGE_REQUEST_ACK;
+    capsule->send_message_request_ack_info.ack = true;
+
+    Packet packet = capsule2packet(capsule, &packet_length);
+
+    freeCapsule(capsule);
+    capsule = packet2capsule(packet, packet_length);
+    freeCapsule(capsule);
+    free(packet);
+}
+
 int main()
 {
     sendMessageRequestInfo();
     sendMessageDataInfo();
+    sendMessageRequestAck();
 }
