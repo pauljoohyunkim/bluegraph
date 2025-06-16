@@ -6,7 +6,8 @@ void serverTransaction()
 
 }
 
-void clientTransaction(Transaction transaction)
+// Given a socket 's' with a valid connection, this function handles the transaction.
+void clientTransaction(Transaction transaction, int s)
 {
     Capsule capsule = NULL;
     Packet packet = NULL;
