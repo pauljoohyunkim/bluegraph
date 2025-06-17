@@ -118,10 +118,16 @@ void startServer()
                     serverCapsule->type = BLUEGRAPH_CAPSULE_TYPE_SEND_MESSAGE_REQUEST_ACK;
                     serverCapsule->send_message_request_ack_info.ack = true;
                     serverPacket = capsule2packet(serverCapsule, &serverPacketSize);
-
                     freeCapsule(serverCapsule);
 
                     write(client, serverPacket, serverPacketSize);
+                    free(serverPacket);
+
+                    // TODO: Getting packet from client
+                    bytes_read = read(client, buf, BLUEGRAPH_CHUNK_SIZE);
+                    clientCapsule = packet2capsule(buf, bytes_read);
+
+                    freeCapsule(clientCapsule);
                     break;
                 default:
                     break;
