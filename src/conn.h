@@ -16,7 +16,7 @@ void freeBluegraphDevices(BluegraphDevice *devices, int nDevices);
 // Server
 void startServer();
 // Client
-void clientConnect(const char *serverAddress, const char *msg);
+void clientConnect(const char *serverAddress, Transaction transaction);
 
 #define MAX_BLUETOOTH_DISCOVERY_DEVICE_NUMBER 255
 #define BLUEGRAPH_CHUNK_SIZE 1024

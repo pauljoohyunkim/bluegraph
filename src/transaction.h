@@ -36,6 +36,8 @@ typedef struct
 
 typedef Transaction_st *Transaction;
 
+Transaction createTransaction();
+void serverTransaction();
 void clientTransaction(Transaction transaction, int s);
 
 #endif

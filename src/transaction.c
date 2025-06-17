@@ -2,6 +2,13 @@
 #include"conn.h"
 #include "transaction.h"
 
+Transaction createTransaction()
+{
+    Transaction transaction = calloc(1, sizeof(Transaction_st));
+
+    return transaction;
+}
+
 void serverTransaction()
 {
 
