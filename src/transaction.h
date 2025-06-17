@@ -16,7 +16,7 @@ typedef enum
 
 typedef enum
 {
-    BLUEGRAPH_MESSAGE_SOURCE_BUFFER,
+    BLUEGRAPH_MESSAGE_SOURCE_BUFFER,    // Text Message; filename is set to NULL.
     BLUEGRAPH_MESSAGE_SOURCE_FILENAME
 } MessageSourceType;
 
@@ -29,6 +29,7 @@ typedef struct
         {
             MessageSourceType sourceType;
             uint8_t *source;
+            size_t messageLen;
         } send_message_info;
     };
 } Transaction_st;
