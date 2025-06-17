@@ -1,6 +1,9 @@
 #ifndef __TRANSACTION_H__
 #define __TRANSACTION_H__
 
+#include <stdint.h>
+#include <stddef.h>
+
 /*
 For BLUEGRAPH_TRANSACTION_TYPE_SEND_MESSAGE,
     1. Client sends SendMessageRequest.

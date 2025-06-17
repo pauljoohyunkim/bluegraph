@@ -1,6 +1,8 @@
 #ifndef __CONN_H__
 #define __CONN_H__
 
+#include "transaction.h"
+
 typedef struct
 {
     char addr[19];
