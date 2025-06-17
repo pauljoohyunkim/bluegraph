@@ -6,6 +6,7 @@
 #include <bluetooth/rfcomm.h>
 #include "capsule.h"
 #include "conn.h"
+#include "transaction.h"
 
 // Creates List of BluegraphDevice
 // Inquires for 1.28 * len seconds.
@@ -135,7 +136,7 @@ void startServer()
 
 // TODO: In the msg, there will be a flag encoded such that
 // the segment sent is the last chunk.
-void clientConnect(const char *serverAddress, const char *msg)
+void clientConnect(const char *serverAddress, Transaction transaction)
 {
     struct sockaddr_rc addr = {0};
     int s, status;
@@ -151,12 +152,8 @@ void clientConnect(const char *serverAddress, const char *msg)
     status = connect(s, (struct sockaddr *)&addr, sizeof(addr));
     // send a message
     if (status == 0)
-    {
-        // TODO: Implement various types of transactions.
-        status = write(s, msg, strlen(msg));
-        memset(buf, 0, BLUEGRAPH_CHUNK_SIZE);
-        status = read(s, buf, BLUEGRAPH_CHUNK_SIZE);
-        //printf("%s\n", buf);
+    {   
+        clientTransaction(transaction, s);
     }
     if (status < 0)
         perror("uh oh");
