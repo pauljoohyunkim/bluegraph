@@ -159,9 +159,8 @@ void clientConnect(const char *serverAddress, Transaction transaction)
     // send a message
     if (status == 0)
     {   
-        clientTransaction(transaction, s);
+        status = clientTransaction(transaction, s);
     }
-    if (status < 0)
-        perror("uh oh");
+    if (status < 0) fprintf(stderr, "Client transaction failed.\n");
     close(s);
 }
