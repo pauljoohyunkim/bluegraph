@@ -40,7 +40,7 @@ typedef struct
 typedef Transaction_st *Transaction;
 
 Transaction createTransaction();
-void serverTransaction();
+int serverTransaction(int s);
 int clientTransaction(Transaction transaction, int s);
 
 #endif

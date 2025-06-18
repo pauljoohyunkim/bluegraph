@@ -11,7 +11,9 @@ Transaction createTransaction()
     return transaction;
 }
 
-void serverTransaction()
+// Given a socket 's' with a valid connection, this function handles the transaction.
+// Returns -1 on error
+int serverTransaction(int s)
 {
 
 }
