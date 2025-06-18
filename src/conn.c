@@ -4,7 +4,9 @@
 #include <bluetooth/hci.h>
 #include <bluetooth/hci_lib.h>
 #include <bluetooth/rfcomm.h>
+#include "capsule.h"
 #include "conn.h"
+#include "transaction.h"
 
 // Creates List of BluegraphDevice
 // Inquires for 1.28 * len seconds.
@@ -76,8 +78,8 @@ void freeBluegraphDevices(BluegraphDevice *devices, int nDevices)
 void startServer()
 {
     struct sockaddr_rc loc_addr = {0}, rem_addr = {0};
-    char buf[1024] = {0};
-    int s, client, bytes_read;
+    uint8_t buf[BLUEGRAPH_CHUNK_SIZE] = {0};
+    int s, client;
     int opt = sizeof(rem_addr);
     
     s = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
@@ -91,14 +93,45 @@ void startServer()
     
     while (1)
     {
+        int bytes_read = 0;
+        Capsule clientCapsule = NULL;
+        Capsule serverCapsule = NULL;
+        Packet serverPacket = NULL;
+        size_t serverPacketSize = 0;
+
         client = accept(s, (struct sockaddr *)&rem_addr, &opt);
         ba2str(&rem_addr.rc_bdaddr, buf);
         fprintf(stderr, "accepted connection from %s\n", buf);
         memset(buf, 0, sizeof(buf));
 
-        bytes_read = read(client, buf, sizeof(buf));
+        bytes_read = read(client, buf, BLUEGRAPH_CHUNK_SIZE);
         if (bytes_read > 0)
         {
+            clientCapsule = packet2capsule(buf, bytes_read);
+            if (!clientCapsule) continue;
+
+            switch (clientCapsule->type)
+            {
+                case BLUEGRAPH_CAPSULE_TYPE_SEND_MESSAGE_REQUEST:
+                    // TODO: For now, send positive ack for all messages.
+                    serverCapsule = createCapsule();
+                    serverCapsule->type = BLUEGRAPH_CAPSULE_TYPE_SEND_MESSAGE_REQUEST_ACK;
+                    serverCapsule->send_message_request_ack_info.ack = true;
+                    serverPacket = capsule2packet(serverCapsule, &serverPacketSize);
+                    freeCapsule(serverCapsule);
+
+                    write(client, serverPacket, serverPacketSize);
+                    free(serverPacket);
+
+                    // TODO: Getting packet from client
+                    bytes_read = read(client, buf, BLUEGRAPH_CHUNK_SIZE);
+                    clientCapsule = packet2capsule(buf, bytes_read);
+
+                    freeCapsule(clientCapsule);
+                    break;
+                default:
+                    break;
+            }
             printf("received [%s]\n", buf);
         }
     }
@@ -109,10 +142,11 @@ void startServer()
 
 // TODO: In the msg, there will be a flag encoded such that
 // the segment sent is the last chunk.
-void clientConnect(const char *serverAddress, const char *msg)
+void clientConnect(const char *serverAddress, Transaction transaction)
 {
     struct sockaddr_rc addr = {0};
     int s, status;
+    uint8_t buf[BLUEGRAPH_CHUNK_SIZE];
 
     // allocate a socket
     s = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
@@ -124,8 +158,8 @@ void clientConnect(const char *serverAddress, const char *msg)
     status = connect(s, (struct sockaddr *)&addr, sizeof(addr));
     // send a message
     if (status == 0)
-    {
-        status = write(s, msg, strlen(msg));
+    {   
+        clientTransaction(transaction, s);
     }
     if (status < 0)
         perror("uh oh");
