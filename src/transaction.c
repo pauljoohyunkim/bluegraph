@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <unistd.h>
 #include "capsule.h"
 #include"conn.h"
@@ -16,7 +17,8 @@ void serverTransaction()
 }
 
 // Given a socket 's' with a valid connection, this function handles the transaction.
-void clientTransaction(Transaction transaction, int s)
+// Returns -1 on error
+int clientTransaction(Transaction transaction, int s)
 {
     Capsule capsule = NULL;
     Packet packet = NULL;
@@ -24,7 +26,7 @@ void clientTransaction(Transaction transaction, int s)
     int status = 0;
     uint8_t buf[BLUEGRAPH_CHUNK_SIZE] = { 0 };
 
-    if (!transaction) return;
+    if (!transaction) return -1;
 
     // From transaction, capsule and packets are built and sent as necessary.
     switch (transaction->type)
@@ -49,29 +51,34 @@ void clientTransaction(Transaction transaction, int s)
                     packet = NULL;
                     if (status < 0)
                     {
-                        // TODO: More sophisticated quit and handle error.
-                        return;
+                        fprintf(stderr, "Error sending message request.\n");
+                        return -1;
                     }
-                    // TODO: receive ack.
+                    // Receive ack
                     status = read(s, buf, BLUEGRAPH_CHUNK_SIZE);
                     if (status < 0)
                     {
-                        // TODO: Handle error when receving ack.
-                        return;
+                        fprintf(stderr, "Could not get packet from the receipient.\n");
+                        return -1;
                     }
                     packetSize = status;
                     capsule = packet2capsule(buf, packetSize);
                     if (!capsule)
                     {
-                        // TODO: Handle error
+                        fprintf(stderr, "Could not construct capsule. Is it a valid packet?\n");
+                        return -1;
                     }
                     if (capsule->type != BLUEGRAPH_CAPSULE_TYPE_SEND_MESSAGE_REQUEST_ACK)
                     {
-                        // TODO: Handle error
+                        freeCapsule(capsule);
+                        fprintf(stderr, "Expected an ACK packet.\n");
+                        return -1;
                     }
                     if (capsule->send_message_request_ack_info.ack == false)
                     {
-                        // TODO: Server blocks the request.
+                        freeCapsule(capsule);
+                        fprintf(stderr, "The recipient blocked the message.\n");
+                        return -1;
                     }
                     freeCapsule(capsule);
                     capsule = NULL;
@@ -89,6 +96,11 @@ void clientTransaction(Transaction transaction, int s)
                     free(capsule);
                     capsule = NULL;
                     status = write(s, packet, packetSize);
+                    if (status < 0)
+                    {
+                        fprintf(stderr, "Failed to send data.\n");
+                        return -1;
+                    }
                     free(packet);
                     
                     break;
@@ -99,4 +111,6 @@ void clientTransaction(Transaction transaction, int s)
         case BLUEGRAPH_TRANSACTION_TYPE_QUERY:
             break;
     }
+
+    return 0;
 }
