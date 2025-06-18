@@ -76,10 +76,8 @@ void freeBluegraphDevices(BluegraphDevice *devices, int nDevices)
 
 void startServer()
 {
-    struct sockaddr_rc loc_addr = {0}, rem_addr = {0};
-    uint8_t buf[BLUEGRAPH_CHUNK_SIZE] = {0};
-    int s, client;
-    int opt = sizeof(rem_addr);
+    struct sockaddr_rc loc_addr = { 0 };
+    int s;
     
     s = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
 
@@ -92,50 +90,9 @@ void startServer()
     
     while (1)
     {
-        int bytes_read = 0;
-        Capsule clientCapsule = NULL;
-        Capsule serverCapsule = NULL;
-        Packet serverPacket = NULL;
-        size_t serverPacketSize = 0;
-
-        client = accept(s, (struct sockaddr *)&rem_addr, &opt);
-        ba2str(&rem_addr.rc_bdaddr, (char *) buf);
-        fprintf(stderr, "accepted connection from %s\n", buf);
-        memset(buf, 0, sizeof(buf));
-
-        bytes_read = read(client, buf, BLUEGRAPH_CHUNK_SIZE);
-        if (bytes_read > 0)
-        {
-            clientCapsule = packet2capsule(buf, bytes_read);
-            if (!clientCapsule) continue;
-
-            switch (clientCapsule->type)
-            {
-                case BLUEGRAPH_CAPSULE_TYPE_SEND_MESSAGE_REQUEST:
-                    // TODO: For now, send positive ack for all messages.
-                    serverCapsule = createCapsule();
-                    serverCapsule->type = BLUEGRAPH_CAPSULE_TYPE_SEND_MESSAGE_REQUEST_ACK;
-                    serverCapsule->send_message_request_ack_info.ack = true;
-                    serverPacket = capsule2packet(serverCapsule, &serverPacketSize);
-                    freeCapsule(serverCapsule);
-
-                    write(client, serverPacket, serverPacketSize);
-                    free(serverPacket);
-
-                    // TODO: Getting packet from client
-                    bytes_read = read(client, buf, BLUEGRAPH_CHUNK_SIZE);
-                    clientCapsule = packet2capsule(buf, bytes_read);
-
-                    freeCapsule(clientCapsule);
-                    break;
-                default:
-                    break;
-            }
-            printf("received [%s]\n", buf);
-        }
+        serverTransaction(s);
     }
     
-    close(client);
     close(s);
 }
 

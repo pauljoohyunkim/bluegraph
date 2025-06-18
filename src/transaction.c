@@ -1,5 +1,8 @@
 #include <stdio.h>
+#include <stdint.h>
 #include <unistd.h>
+#include <bluetooth/bluetooth.h>
+#include <bluetooth/rfcomm.h>
 #include "capsule.h"
 #include"conn.h"
 #include "transaction.h"
@@ -11,9 +14,71 @@ Transaction createTransaction()
     return transaction;
 }
 
-void serverTransaction()
+// Given a socket 's' with a valid connection, this function handles the transaction.
+// Returns -1 on error
+int serverTransaction(int s)
 {
+    struct sockaddr_rc rem_addr = { 0 };
+    int status = 0;
+    int client = 0;
+    uint8_t buf[BLUEGRAPH_CHUNK_SIZE] = { 0 };
+    Capsule clientCapsule = NULL;
+    Capsule serverCapsule = NULL;
+    Packet serverPacket = NULL;
+    size_t serverPacketSize = 0;
+    int opt = sizeof(rem_addr);
 
+    client = accept(s, (struct sockaddr *)&rem_addr, &opt);
+    ba2str(&rem_addr.rc_bdaddr, (char *) buf);
+    fprintf(stderr, "accepted connection from %s\n", buf);
+    memset(buf, 0, sizeof(buf));
+
+    status = read(client, buf, BLUEGRAPH_CHUNK_SIZE);
+    if (status > 0)
+    {
+        clientCapsule = packet2capsule(buf, status);
+        if (!clientCapsule) return -1;
+
+        switch (clientCapsule->type)
+        {
+            case BLUEGRAPH_CAPSULE_TYPE_SEND_MESSAGE_REQUEST:
+                // TODO: For now, send positive ack for all messages.
+                serverCapsule = createCapsule();
+                serverCapsule->type = BLUEGRAPH_CAPSULE_TYPE_SEND_MESSAGE_REQUEST_ACK;
+                serverCapsule->send_message_request_ack_info.ack = true;
+                serverPacket = capsule2packet(serverCapsule, &serverPacketSize);
+                freeCapsule(serverCapsule);
+
+                status = write(client, serverPacket, serverPacketSize);
+                free(serverPacket);
+                if (status < 0)
+                {
+                    fprintf(stderr, "Could not send ack to client.\n");
+                    break;
+                }
+
+                // TODO: Getting packet from client
+                status = read(client, buf, BLUEGRAPH_CHUNK_SIZE);
+                if (status < 0)
+                {
+                    fprintf(stderr, "Could not get packet from client.\n");
+                    break;
+                }
+                clientCapsule = packet2capsule(buf, status);
+                if (!clientCapsule)
+                {
+                    fprintf(stderr, "Could not create packet from client.\n");
+                    freeCapsule(clientCapsule);
+                    break;
+                }
+                freeCapsule(clientCapsule);
+                break;
+            default:
+                break;
+        }
+        printf("received [%s]\n", buf);
+    }
+    close(client);
 }
 
 // Given a socket 's' with a valid connection, this function handles the transaction.
