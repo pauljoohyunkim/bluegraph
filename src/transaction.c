@@ -19,7 +19,7 @@ Transaction createTransaction()
 int serverTransaction(int s)
 {
     struct sockaddr_rc rem_addr = { 0 };
-    int bytes_read = 0;
+    int status = 0;
     int client = 0;
     uint8_t buf[BLUEGRAPH_CHUNK_SIZE] = { 0 };
     Capsule clientCapsule = NULL;
@@ -33,10 +33,10 @@ int serverTransaction(int s)
     fprintf(stderr, "accepted connection from %s\n", buf);
     memset(buf, 0, sizeof(buf));
 
-    bytes_read = read(client, buf, BLUEGRAPH_CHUNK_SIZE);
-    if (bytes_read > 0)
+    status = read(client, buf, BLUEGRAPH_CHUNK_SIZE);
+    if (status > 0)
     {
-        clientCapsule = packet2capsule(buf, bytes_read);
+        clientCapsule = packet2capsule(buf, status);
         if (!clientCapsule) return -1;
 
         switch (clientCapsule->type)
@@ -49,13 +49,28 @@ int serverTransaction(int s)
                 serverPacket = capsule2packet(serverCapsule, &serverPacketSize);
                 freeCapsule(serverCapsule);
 
-                write(client, serverPacket, serverPacketSize);
+                status = write(client, serverPacket, serverPacketSize);
                 free(serverPacket);
+                if (status < 0)
+                {
+                    fprintf(stderr, "Could not send ack to client.\n");
+                    break;
+                }
 
                 // TODO: Getting packet from client
-                bytes_read = read(client, buf, BLUEGRAPH_CHUNK_SIZE);
-                clientCapsule = packet2capsule(buf, bytes_read);
-
+                status = read(client, buf, BLUEGRAPH_CHUNK_SIZE);
+                if (status < 0)
+                {
+                    fprintf(stderr, "Could not get packet from client.\n");
+                    break;
+                }
+                clientCapsule = packet2capsule(buf, status);
+                if (!clientCapsule)
+                {
+                    fprintf(stderr, "Could not create packet from client.\n");
+                    freeCapsule(clientCapsule);
+                    break;
+                }
                 freeCapsule(clientCapsule);
                 break;
             default:
