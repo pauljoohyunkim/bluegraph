@@ -12,6 +12,8 @@ Capsule createCapsule()
 
 void freeCapsule(Capsule capsule)
 {
+    if (!capsule) return;
+
     switch (capsule->type)
     {
         case BLUEGRAPH_CAPSULE_TYPE_SEND_MESSAGE_REQUEST:
@@ -19,6 +21,8 @@ void freeCapsule(Capsule capsule)
             break;
         case BLUEGRAPH_CAPSULE_TYPE_SEND_MESSAGE_DATA:
             free(capsule->send_message_data_info.msg);
+            break;
+        default:
             break;
     }
     free(capsule);
@@ -70,7 +74,7 @@ Packet capsule2packet(Capsule capsule, size_t *pSize)
             packet[index] = capsule->send_message_request_info.filenameLen;
             index += sizeof(uint8_t);
             if (capsule->send_message_request_info.filenameLen > 0)
-                strncpy(packet + index, capsule->send_message_request_info.filename, capsule->send_message_request_info.filenameLen);
+                memcpy(packet + index, capsule->send_message_request_info.filename, capsule->send_message_request_info.filenameLen);
             index += capsule->send_message_request_info.filenameLen;
             break;
         case BLUEGRAPH_CAPSULE_TYPE_SEND_MESSAGE_DATA:
@@ -78,7 +82,7 @@ Packet capsule2packet(Capsule capsule, size_t *pSize)
             index += sizeof(uint8_t);
             *((uint64_t*) (packet + index)) = (uint64_t) htobe64(capsule->send_message_request_info.msgLen);
             index += sizeof(uint64_t);
-            strncpy(packet + index, capsule->send_message_data_info.msg, capsule->send_message_data_info.msgLen);
+            memcpy(packet + index, capsule->send_message_data_info.msg, capsule->send_message_data_info.msgLen);
             index += capsule->send_message_data_info.msgLen;
             break;
         case BLUEGRAPH_CAPSULE_TYPE_SEND_MESSAGE_REQUEST_ACK:
@@ -97,7 +101,6 @@ Capsule packet2capsule(Packet packet, size_t size)
 {
     Capsule capsule = calloc(1, sizeof(Capsule_st));
     size_t index = 0;
-    uint8_t c = 0;
     if (!capsule) return NULL;
 
     capsule->type = (CapsuleType) packet[index];

@@ -16,7 +16,6 @@ BluegraphDevice *discoverDevices(int len, int *nDevices)
     inquiry_info* ii = NULL;
     int dev_id, sock;
     const int maxDevices = MAX_BLUETOOTH_DISCOVERY_DEVICE_NUMBER;
-    char addr[100];     // TODO: Testing
 
     // Open Bluetooth adapter
     dev_id = hci_get_route(NULL);
@@ -100,7 +99,7 @@ void startServer()
         size_t serverPacketSize = 0;
 
         client = accept(s, (struct sockaddr *)&rem_addr, &opt);
-        ba2str(&rem_addr.rc_bdaddr, buf);
+        ba2str(&rem_addr.rc_bdaddr, (char *) buf);
         fprintf(stderr, "accepted connection from %s\n", buf);
         memset(buf, 0, sizeof(buf));
 
@@ -146,7 +145,6 @@ void clientConnect(const char *serverAddress, Transaction transaction)
 {
     struct sockaddr_rc addr = {0};
     int s, status;
-    uint8_t buf[BLUEGRAPH_CHUNK_SIZE];
 
     // allocate a socket
     s = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
