@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdint.h>
+#include <time.h>
 #include <unistd.h>
 #include <bluetooth/bluetooth.h>
 #include <bluetooth/rfcomm.h>
@@ -23,6 +24,7 @@ int serverTransaction(int s)
     int status = 0;
     int client = 0;
     uint8_t buf[BLUEGRAPH_CHUNK_SIZE] = { 0 };
+    uint8_t compressedBDAddress[13] = { 0 };
     Capsule clientCapsule = NULL;
     Capsule serverCapsule = NULL;
     Packet serverPacket = NULL;
@@ -32,6 +34,7 @@ int serverTransaction(int s)
 
     client = accept(s, (struct sockaddr *)&rem_addr, &opt);
     ba2str(&rem_addr.rc_bdaddr, (char *) buf);
+    stringAddress2CompressedBDAddress(compressedBDAddress, buf);
     fprintf(stderr, "accepted connection from %s\n", buf);
     memset(buf, 0, sizeof(buf));
 
@@ -50,6 +53,7 @@ int serverTransaction(int s)
                 messageFileInfo->direction = BLUEGRAPH_INCOMING;
                 messageFileInfo->isText = clientCapsule->send_message_request_info.messageType == BLUEGRAPH_MESSAGE_TYPE_TEXT;
                 messageFileInfo->info = calloc(clientCapsule->send_message_request_info.msgLen, sizeof(uint8_t));
+                messageFileInfo->time = time(NULL);
 
                 serverCapsule = createCapsule();
                 serverCapsule->type = BLUEGRAPH_CAPSULE_TYPE_SEND_MESSAGE_REQUEST_ACK;
@@ -80,6 +84,7 @@ int serverTransaction(int s)
                     break;
                 }
                 memcpy(messageFileInfo->info, clientCapsule->send_message_data_info.msg, clientCapsule->send_message_request_info.msgLen);
+                writeMessageInfo(messageFileInfo, "/home/pbjk/.bluegraph/123124132441/test2.txt");
                 freeCapsule(clientCapsule);
                 freeMessageInfo(messageFileInfo);
                 break;
