@@ -1,9 +1,25 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 #include <sys/stat.h>
 #include <dirent.h>
 #include "storage.h"
+
+static bool isCompressedBAAddress(char *dirname);
+
+// Helper function for checking the format XXxxXXxxXXxx
+static bool isCompressedBAAddress(char *dirname)
+{
+    if (strlen(dirname) != 12)
+        return false;
+    for (int i = 0; i < 12; i++)
+    {
+        if ((dirname[i] < 'A' || dirname[i] > 'F') && (dirname[i] < '0' || dirname[i] > '9'))
+            return false;
+    }
+    return true;
+}
 
 FileList createFileList()
 {
@@ -78,6 +94,8 @@ BluegraphStorage bluegraph_load_storage()
     }
 
     // Read through the bluegraph rootdir
+    // Each directory should be XXxxXXxxXXxx
+    // where it is associated with bdaddr XX:xx:XX:xx:XX:xx
     storage->chats = createFileList();
     dp = opendir(storage->dir);
     while ((op = readdir(dp)) != NULL)
@@ -91,7 +109,7 @@ BluegraphStorage bluegraph_load_storage()
         strcat(filename, "/");
         strcat(filename, op->d_name);
         stat(filename, &filestat);
-        if (!S_ISDIR(filestat.st_mode))
+        if (!S_ISDIR(filestat.st_mode) || !isCompressedBAAddress(op->d_name))
         {
             free(filename);
             continue;
