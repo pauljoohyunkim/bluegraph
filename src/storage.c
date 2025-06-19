@@ -5,6 +5,43 @@
 #include <dirent.h>
 #include "storage.h"
 
+FileList createFileList()
+{
+    FileList filelist = calloc(1, sizeof(FileList_st));
+    filelist->size = 0;
+    filelist->filenames = calloc(1, sizeof(char*));
+    filelist->capacity = 1;
+
+    return filelist;
+}
+
+void addToFileList(FileList filelist, char *filename)
+{
+    // TODO: Implement this.
+    if (!filelist) return;
+
+    if (filelist->size == filelist->capacity)
+    {
+        filelist->capacity *= 2;
+        filelist->filenames = realloc(filelist->filenames, filelist->capacity * sizeof(char*));
+    }
+    filelist->filenames[filelist->size] = calloc(strlen(filename) + 1, sizeof(char));
+    strcpy(filelist->filenames[filelist->size], filename);
+    filelist->size++;
+}
+
+void freeFileList(FileList filelist)
+{
+    if (!filelist) return;
+
+    for (size_t i = 0; i < filelist->size; i++)
+    {
+        free(filelist->filenames[i]);
+    }
+    free(filelist->filenames);
+    free(filelist);
+}
+
 BluegraphStorage bluegraph_load_storage()
 {
     BluegraphStorage storage = NULL;
@@ -41,6 +78,7 @@ BluegraphStorage bluegraph_load_storage()
     }
 
     // Read through the bluegraph rootdir
+    storage->chats = createFileList();
     dp = opendir(storage->dir);
     while ((op = readdir(dp)) != NULL)
     {
@@ -54,8 +92,12 @@ BluegraphStorage bluegraph_load_storage()
         strcat(filename, op->d_name);
         stat(filename, &filestat);
         if (!S_ISDIR(filestat.st_mode))
+        {
+            free(filename);
             continue;
+        }
         printf("%s\n", filename);
+        addToFileList(storage->chats, op->d_name);
         free(filename);
     }
     closedir(dp);
@@ -68,5 +110,6 @@ void freeBluegraphStorage(BluegraphStorage storage)
     if (!storage) return;
 
     free(storage->dir);
+    freeFileList(storage->chats);
     free(storage);
 }
