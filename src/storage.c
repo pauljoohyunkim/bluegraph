@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 #include "storage.h"
 
 BluegraphStorage bluegraph_load_storage()
@@ -8,6 +9,7 @@ BluegraphStorage bluegraph_load_storage()
     BluegraphStorage storage = NULL;
     char *homedir = NULL;
     const char bluegraphdir[] = "/.bluegraph";
+    struct stat st;
 
     homedir = getenv("HOME");       // TODO: Make this cross-platform.
     if (!homedir)
@@ -15,7 +17,6 @@ BluegraphStorage bluegraph_load_storage()
         fprintf(stderr, "Could not find HOME environment variable.\n");
         return NULL;
     }
-    
 
     storage = calloc(1, sizeof(BluegraphStorage_st));
     if (!storage)
@@ -29,6 +30,12 @@ BluegraphStorage bluegraph_load_storage()
     strcpy(storage->dir, homedir);
     strcat(storage->dir, bluegraphdir);
 
+    // If the directory does not exist, create one.
+    if (stat(storage->dir, &st) == -1)
+    {
+        fprintf(stderr, "Creating %s\n", storage->dir);
+        mkdir(storage->dir, 0700);
+    }
     return storage;
 }
 
