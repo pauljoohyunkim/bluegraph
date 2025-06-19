@@ -2,6 +2,7 @@
 #define __STORAGE_H__
 
 #include <stdlib.h>
+#include "conn.h"
 
 typedef struct
 {
@@ -20,9 +21,18 @@ typedef struct
 
 typedef BluegraphStorage_st *BluegraphStorage;
 
+typedef struct
+{
+    BluegraphDevice contact;
+    FileList chatfiles;
+} BluegraphChat_st;
+typedef BluegraphChat_st *BluegraphChat;
+
 FileList createFileList();
 void addToFileList(FileList filelist, char *filename);
 void freeFileList(FileList filelist);
+BluegraphChat loadBluegraphChat(char *bdaddr_dirname);
+void freeBluegraphChat(BluegraphChat chat);
 BluegraphStorage bluegraph_load_storage();
 void freeBluegraphStorage(BluegraphStorage storage);
 

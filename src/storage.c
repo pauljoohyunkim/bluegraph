@@ -33,7 +33,6 @@ FileList createFileList()
 
 void addToFileList(FileList filelist, char *filename)
 {
-    // TODO: Implement this.
     if (!filelist) return;
 
     if (filelist->size == filelist->capacity)
@@ -56,6 +55,16 @@ void freeFileList(FileList filelist)
     }
     free(filelist->filenames);
     free(filelist);
+}
+
+BluegraphChat loadBluegraphChat(char *bdaddr_dirname)
+{
+
+}
+
+void freeBluegraphChat(BluegraphChat chat)
+{
+
 }
 
 BluegraphStorage bluegraph_load_storage()
