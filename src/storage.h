@@ -36,4 +36,6 @@ void freeBluegraphChat(BluegraphChat chat);
 BluegraphStorage bluegraph_load_storage();
 void freeBluegraphStorage(BluegraphStorage storage);
 
+void compressedBAAddress2StringAddress(char *stringAddress, char *compressedBAAddress);
+
 #endif

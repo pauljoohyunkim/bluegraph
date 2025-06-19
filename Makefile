@@ -12,5 +12,7 @@ test/serialtest: test/serialtest.c src/capsule.c src/transaction.c src/capsule.c
 	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
 test/storagetest: test/storagetest.c src/storage.c
 	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
+test/addresstranslation: test/addresstranslation.c src/storage.c
+	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
 clean:
 	rm -f test/*test

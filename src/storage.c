@@ -59,7 +59,11 @@ void freeFileList(FileList filelist)
 
 BluegraphChat loadBluegraphChat(char *bdaddr_dirname)
 {
+    BluegraphChat chat = NULL;
 
+    chat = calloc(1, sizeof(BluegraphChat_st));
+    chat->contact = calloc(1, sizeof(BluegraphDevice_st));
+    
 }
 
 void freeBluegraphChat(BluegraphChat chat)
@@ -139,4 +143,18 @@ void freeBluegraphStorage(BluegraphStorage storage)
     free(storage->dir);
     freeFileList(storage->chatdirs);
     free(storage);
+}
+
+void compressedBAAddress2StringAddress(char *stringAddress, char *compressedBAAddress)
+{
+    if (!stringAddress || !compressedBAAddress) return;
+    if (!isCompressedBAAddress(compressedBAAddress)) return;
+
+    memset(stringAddress, 0, 18);
+    strncpy(stringAddress, compressedBAAddress, 2);
+    for (int i = 1; i < 6; i++)
+    {
+        strcat(stringAddress, ":");
+        strncat(stringAddress, compressedBAAddress + 2 * i, 2);
+    }
 }

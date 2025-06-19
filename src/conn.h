@@ -5,7 +5,7 @@
 
 typedef struct
 {
-    char addr[19];
+    char addr[18];
     char name[248];
 } BluegraphDevice_st;
 
