@@ -61,5 +61,6 @@ BluegraphStorage bluegraph_load_storage();
 void freeBluegraphStorage(BluegraphStorage storage);
 
 void compressedBDAddress2StringAddress(char *stringAddress, char *compressedBDAddress);
+void stringAddress2CompressedBDAddress(char *compressedBDAddress, char *stringAddress);
 
 #endif

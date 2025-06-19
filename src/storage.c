@@ -262,3 +262,24 @@ void compressedBDAddress2StringAddress(char *stringAddress, char *compressedBDAd
         strncat(stringAddress, compressedBDAddress + 2 * i, 2);
     }
 }
+
+void stringAddress2CompressedBDAddress(char *compressedBDAddress, char *stringAddress)
+{
+    int i = 0;
+    int j = 0;
+    if (!stringAddress || !compressedBDAddress) return;
+
+    memset(compressedBDAddress, 0, 13);
+
+    while (i < 18)
+    {
+        if (stringAddress[i] == ':')
+        {
+            i++;
+            continue;
+        }
+        compressedBDAddress[j] = stringAddress[i];
+        j++;
+        i++;
+    }
+}
