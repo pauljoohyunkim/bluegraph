@@ -6,9 +6,10 @@ int main()
 	WINDOW *lwin = NULL;
 	WINDOW *rwin_up = NULL;
 	WINDOW *rwin_down = NULL;
-	bluegraph_initialize_tui(&lwin, &rwin_up, &rwin_down);
+	BluegraphWindows windows = NULL;
+	windows = bluegraph_initialize_tui();
 
-	wgetch(lwin);
-	bluegraph_end_tui(lwin, rwin_up, rwin_down);
+	getch();
+	bluegraph_end_tui(windows);
 	return 0;
 }
