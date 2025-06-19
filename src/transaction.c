@@ -4,8 +4,9 @@
 #include <bluetooth/bluetooth.h>
 #include <bluetooth/rfcomm.h>
 #include "capsule.h"
-#include"conn.h"
+#include "conn.h"
 #include "transaction.h"
+#include "storage.h"
 
 Transaction createTransaction()
 {
@@ -26,6 +27,7 @@ int serverTransaction(int s)
     Capsule serverCapsule = NULL;
     Packet serverPacket = NULL;
     size_t serverPacketSize = 0;
+    MessageFileInfo messageFileInfo = NULL;
     int opt = sizeof(rem_addr);
 
     client = accept(s, (struct sockaddr *)&rem_addr, &opt);
@@ -43,6 +45,12 @@ int serverTransaction(int s)
         {
             case BLUEGRAPH_CAPSULE_TYPE_SEND_MESSAGE_REQUEST:
                 // TODO: For now, send positive ack for all messages.
+                // TODO: For now, only handle text message.
+                messageFileInfo = calloc(1, sizeof(MessageFileInfo_st));
+                messageFileInfo->direction = BLUEGRAPH_INCOMING;
+                messageFileInfo->isText = clientCapsule->send_message_request_info.messageType == BLUEGRAPH_MESSAGE_TYPE_TEXT;
+                messageFileInfo->info = calloc(clientCapsule->send_message_request_info.msgLen, sizeof(uint8_t));
+
                 serverCapsule = createCapsule();
                 serverCapsule->type = BLUEGRAPH_CAPSULE_TYPE_SEND_MESSAGE_REQUEST_ACK;
                 serverCapsule->send_message_request_ack_info.ack = true;
@@ -71,7 +79,9 @@ int serverTransaction(int s)
                     freeCapsule(clientCapsule);
                     break;
                 }
+                memcpy(messageFileInfo->info, clientCapsule->send_message_data_info.msg, clientCapsule->send_message_request_info.msgLen);
                 freeCapsule(clientCapsule);
+                freeMessageInfo(messageFileInfo);
                 break;
             default:
                 break;
