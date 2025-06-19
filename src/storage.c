@@ -6,10 +6,10 @@
 #include <dirent.h>
 #include "storage.h"
 
-static bool isCompressedBAAddress(char *dirname);
+static bool isCompressedBDAddress(char *dirname);
 
 // Helper function for checking the format XXxxXXxxXXxx
-static bool isCompressedBAAddress(char *dirname)
+static bool isCompressedBDAddress(char *dirname)
 {
     if (strlen(dirname) != 12)
         return false;
@@ -57,13 +57,44 @@ void freeFileList(FileList filelist)
     free(filelist);
 }
 
+// Pass in the full path to bdaddr directory.
+// Loads chat for a single Bluetooth device.
 BluegraphChat loadBluegraphChat(char *bdaddr_dirname)
 {
     BluegraphChat chat = NULL;
+    char *bdaddr = NULL;
+    DIR *dp = NULL;
+    struct dirent *op = NULL;
+
+    // bdaddr is the basename for bdaddr_dirname
+    bdaddr = strrchr(bdaddr_dirname, '/');
+    if (!bdaddr) return NULL;
+    bdaddr += 1;
 
     chat = calloc(1, sizeof(BluegraphChat_st));
     chat->contact = calloc(1, sizeof(BluegraphDevice_st));
+    compressedBDAddress2StringAddress(chat->contact->addr, bdaddr);
+    // TODO: For the name, check remotely, and if it fails, used cached name.
     
+    // Reading through the bdaddr_dirname directory.
+    dp = opendir(bdaddr_dirname);
+    while ((op = readdir(dp)) != NULL)
+    {
+        struct stat filestat = { 0 };
+        char *filename = NULL;
+        if (strcmp(op->d_name, ".") == 0 || strcmp(op->d_name, "..") == 0)
+            continue;
+        filename = calloc(strlen(op->d_name) + strlen(bdaddr_dirname) + 2, sizeof(char));
+        strcpy(filename, bdaddr_dirname);
+        strcat(filename, "/");
+        strcat(filename, op->d_name);
+        stat(filename, &filestat);
+
+        printf("%s\n", filename);
+        free(filename);
+    }
+    closedir(dp);
+
 }
 
 void freeBluegraphChat(BluegraphChat chat)
@@ -122,13 +153,14 @@ BluegraphStorage bluegraph_load_storage()
         strcat(filename, "/");
         strcat(filename, op->d_name);
         stat(filename, &filestat);
-        if (!S_ISDIR(filestat.st_mode) || !isCompressedBAAddress(op->d_name))
+        if (!S_ISDIR(filestat.st_mode) || !isCompressedBDAddress(op->d_name))
         {
             free(filename);
             continue;
         }
         printf("%s\n", filename);
         addToFileList(storage->chatdirs, op->d_name);
+        loadBluegraphChat(filename);
         free(filename);
     }
     closedir(dp);
@@ -145,16 +177,16 @@ void freeBluegraphStorage(BluegraphStorage storage)
     free(storage);
 }
 
-void compressedBAAddress2StringAddress(char *stringAddress, char *compressedBAAddress)
+void compressedBDAddress2StringAddress(char *stringAddress, char *compressedBDAddress)
 {
-    if (!stringAddress || !compressedBAAddress) return;
-    if (!isCompressedBAAddress(compressedBAAddress)) return;
+    if (!stringAddress || !compressedBDAddress) return;
+    if (!isCompressedBDAddress(compressedBDAddress)) return;
 
     memset(stringAddress, 0, 18);
-    strncpy(stringAddress, compressedBAAddress, 2);
+    strncpy(stringAddress, compressedBDAddress, 2);
     for (int i = 1; i < 6; i++)
     {
         strcat(stringAddress, ":");
-        strncat(stringAddress, compressedBAAddress + 2 * i, 2);
+        strncat(stringAddress, compressedBDAddress + 2 * i, 2);
     }
 }

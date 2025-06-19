@@ -31,11 +31,13 @@ typedef BluegraphChat_st *BluegraphChat;
 FileList createFileList();
 void addToFileList(FileList filelist, char *filename);
 void freeFileList(FileList filelist);
+
 BluegraphChat loadBluegraphChat(char *bdaddr_dirname);
 void freeBluegraphChat(BluegraphChat chat);
+
 BluegraphStorage bluegraph_load_storage();
 void freeBluegraphStorage(BluegraphStorage storage);
 
-void compressedBAAddress2StringAddress(char *stringAddress, char *compressedBAAddress);
+void compressedBDAddress2StringAddress(char *stringAddress, char *compressedBDAddress);
 
 #endif
