@@ -89,8 +89,7 @@ BluegraphChat loadBluegraphChat(char *bdaddr_dirname)
         strcat(filename, "/");
         strcat(filename, op->d_name);
         stat(filename, &filestat);
-
-        printf("%s\n", filename);
+        addToFileList(chat->chatfiles, filename);
         free(filename);
     }
     closedir(dp);
@@ -99,7 +98,7 @@ BluegraphChat loadBluegraphChat(char *bdaddr_dirname)
 
 void freeBluegraphChat(BluegraphChat chat)
 {
-
+    
 }
 
 BluegraphStorage bluegraph_load_storage()
