@@ -90,7 +90,7 @@ BluegraphChat loadBluegraphChat(char *bdaddr_dirname)
         strcat(filename, "/");
         strcat(filename, op->d_name);
         stat(filename, &filestat);
-        addToFileList(chat->chatfiles, filename);
+        addToFileList(chat->chatfiles, op->d_name);
         free(filename);
     }
     closedir(dp);
