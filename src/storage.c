@@ -77,6 +77,7 @@ BluegraphChat loadBluegraphChat(char *bdaddr_dirname)
     // TODO: For the name, check remotely, and if it fails, used cached name.
     
     // Reading through the bdaddr_dirname directory.
+    chat->chatfiles = createFileList();
     dp = opendir(bdaddr_dirname);
     while ((op = readdir(dp)) != NULL)
     {
@@ -98,7 +99,10 @@ BluegraphChat loadBluegraphChat(char *bdaddr_dirname)
 
 void freeBluegraphChat(BluegraphChat chat)
 {
-    
+    if (!chat) return;
+
+    freeFileList(chat->chatfiles);
+    free(chat);
 }
 
 BluegraphStorage bluegraph_load_storage()
