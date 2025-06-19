@@ -57,6 +57,7 @@ void freeFileList(FileList filelist)
     free(filelist);
 }
 
+// TODO: Get time value.
 MessageFileInfo loadMessageInfo(char *filename)
 {
     MessageFileInfo info = NULL;
@@ -88,6 +89,22 @@ MessageFileInfo loadMessageInfo(char *filename)
     fclose(fp);
 
     return info;
+}
+
+// TODO: instead of filename, pass in a BluegraphStorage and bdaddr.
+void writeMessageInfo(MessageFileInfo info, char *filename)
+{
+    FILE *fp = NULL;
+    if (!info) return;
+
+    fp = fopen(filename, "wb");
+    if (!fp) return;
+
+    // Write the first two bytes to encode information on direction and if it's a text.
+    fwrite((uint8_t *) &(info->direction), sizeof(uint8_t), 1, fp);
+    fwrite((uint8_t *) &(info->isText), sizeof(uint8_t), 1, fp);
+    fwrite(info->info, sizeof(uint8_t), strlen(info->info), fp);
+    fclose(fp);
 }
 
 void freeMessageInfo(MessageFileInfo info)
