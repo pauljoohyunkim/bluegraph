@@ -15,7 +15,7 @@ typedef FileList_st *FileList;
 typedef struct
 {
     char *dir;
-    FileList chats;
+    FileList chatdirs;
 } BluegraphStorage_st;
 
 typedef BluegraphStorage_st *BluegraphStorage;

@@ -96,7 +96,7 @@ BluegraphStorage bluegraph_load_storage()
     // Read through the bluegraph rootdir
     // Each directory should be XXxxXXxxXXxx
     // where it is associated with bdaddr XX:xx:XX:xx:XX:xx
-    storage->chats = createFileList();
+    storage->chatdirs = createFileList();
     dp = opendir(storage->dir);
     while ((op = readdir(dp)) != NULL)
     {
@@ -115,7 +115,7 @@ BluegraphStorage bluegraph_load_storage()
             continue;
         }
         printf("%s\n", filename);
-        addToFileList(storage->chats, op->d_name);
+        addToFileList(storage->chatdirs, op->d_name);
         free(filename);
     }
     closedir(dp);
@@ -128,6 +128,6 @@ void freeBluegraphStorage(BluegraphStorage storage)
     if (!storage) return;
 
     free(storage->dir);
-    freeFileList(storage->chats);
+    freeFileList(storage->chatdirs);
     free(storage);
 }
