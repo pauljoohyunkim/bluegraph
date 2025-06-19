@@ -92,19 +92,33 @@ MessageFileInfo loadMessageInfo(char *filename)
 }
 
 // TODO: instead of filename, pass in a BluegraphStorage and bdaddr.
-void writeMessageInfo(MessageFileInfo info, char *filename)
+void writeMessageInfo(MessageFileInfo info, char *bdaddr_dirname)
 {
     FILE *fp = NULL;
+    char *messageFilename = NULL;
+    char epochstr[21] = { 0 };
     if (!info) return;
 
-    fp = fopen(filename, "wb");
-    if (!fp) return;
+    snprintf(epochstr, sizeof(epochstr), "%llu", info->time);
+
+    messageFilename = calloc(sizeof(uint64_t) + strlen(bdaddr_dirname) + 2, sizeof(uint8_t));
+    strcpy(messageFilename, bdaddr_dirname);
+    strcat(messageFilename, "/");
+    strcat(messageFilename, epochstr);
+
+    fp = fopen(messageFilename, "wb");
+    if (!fp)
+    {
+        free(messageFilename);
+        return;
+    }
 
     // Write the first two bytes to encode information on direction and if it's a text.
     fwrite((uint8_t *) &(info->direction), sizeof(uint8_t), 1, fp);
     fwrite((uint8_t *) &(info->isText), sizeof(uint8_t), 1, fp);
     fwrite(info->info, sizeof(uint8_t), strlen(info->info), fp);
     fclose(fp);
+    free(messageFilename);
 }
 
 void freeMessageInfo(MessageFileInfo info)

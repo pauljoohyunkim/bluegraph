@@ -51,6 +51,7 @@ void addToFileList(FileList filelist, char *filename);
 void freeFileList(FileList filelist);
 
 MessageFileInfo loadMessageInfo(char *filename);
+void writeMessageInfo(MessageFileInfo info, char *bdaddr_dirname);
 void freeMessageInfo(MessageFileInfo info);
 
 BluegraphChat loadBluegraphChat(char *bdaddr_dirname);
