@@ -31,3 +31,11 @@ BluegraphStorage bluegraph_load_storage()
 
     return storage;
 }
+
+void freeBluegraphStorage(BluegraphStorage storage)
+{
+    if (!storage) return;
+
+    free(storage->dir);
+    free(storage);
+}

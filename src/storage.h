@@ -9,5 +9,6 @@ typedef struct
 typedef BluegraphStorage_st *BluegraphStorage;
 
 BluegraphStorage bluegraph_load_storage();
+void freeBluegraphStorage(BluegraphStorage storage);
 
 #endif
