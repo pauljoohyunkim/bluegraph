@@ -61,15 +61,39 @@ MessageFileInfo loadMessageInfo(char *filename)
 {
     MessageFileInfo info = NULL;
     FILE *fp = NULL;
+    size_t bytes = 0;
+    size_t filesize = 0;
 
     fp = fopen(filename, "r");
     if (fp == NULL) return NULL;
+
+    // Determine file size
+    fseek(fp, 0, SEEK_END);
+    filesize = ftell(fp);
+    fseek(fp, 0, SEEK_SET);
+
+    info = calloc(1, sizeof(MessageFileInfo_st));
     // Read the first two bytes to determine its direction, and whether it is a text message.
+    bytes = fread(&(info->direction), sizeof(uint8_t), 1, fp);
+    bytes = fread(&(info->isText), sizeof(uint8_t), 1, fp);
+    if (bytes == 0 || (info->direction != BLUEGRAPH_INCOMING && info->direction != BLUEGRAPH_OUTGOING))
+    {
+        fclose(fp);
+        freeMessageInfo(info);
+        return NULL;
+    }
+
+    info->info = calloc(filesize, sizeof(char));
+    bytes = fread(info->info, 1, filesize, fp);
+    fclose(fp);
+
+    return info;
 }
 
 void freeMessageInfo(MessageFileInfo info)
 {
-
+    free(info->info);
+    free(info);
 }
 
 // Pass in the full path to bdaddr directory.
