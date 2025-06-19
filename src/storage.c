@@ -57,6 +57,21 @@ void freeFileList(FileList filelist)
     free(filelist);
 }
 
+MessageFileInfo loadMessageInfo(char *filename)
+{
+    MessageFileInfo info = NULL;
+    FILE *fp = NULL;
+
+    fp = fopen(filename, "r");
+    if (fp == NULL) return NULL;
+    // Read the first two bytes to determine its direction, and whether it is a text message.
+}
+
+void freeMessageInfo(MessageFileInfo info)
+{
+
+}
+
 // Pass in the full path to bdaddr directory.
 // Loads chat for a single Bluetooth device.
 BluegraphChat loadBluegraphChat(char *bdaddr_dirname)
@@ -94,7 +109,6 @@ BluegraphChat loadBluegraphChat(char *bdaddr_dirname)
         free(filename);
     }
     closedir(dp);
-
 }
 
 void freeBluegraphChat(BluegraphChat chat)

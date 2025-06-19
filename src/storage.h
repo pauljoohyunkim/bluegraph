@@ -2,6 +2,7 @@
 #define __STORAGE_H__
 
 #include <stdlib.h>
+#include <time.h>
 #include "conn.h"
 
 typedef struct
@@ -28,9 +29,29 @@ typedef struct
 } BluegraphChat_st;
 typedef BluegraphChat_st *BluegraphChat;
 
+typedef enum
+{
+    BLUEGRAPH_INCOMING,
+    BLUEGRAPH_OUTGOING
+} MessageDirection;
+
+typedef struct
+{
+    time_t time;
+    MessageDirection direction;
+    bool isText;
+    // If isText == true, then info is the content of the message.
+    // Otherwise it is the name of the file.
+    char *info;
+} MessageFileInfo_st;
+typedef MessageFileInfo_st *MessageFileInfo;
+
 FileList createFileList();
 void addToFileList(FileList filelist, char *filename);
 void freeFileList(FileList filelist);
+
+MessageFileInfo loadMessageInfo(char *filename);
+void freeMessageInfo(MessageFileInfo info);
 
 BluegraphChat loadBluegraphChat(char *bdaddr_dirname);
 void freeBluegraphChat(BluegraphChat chat);
