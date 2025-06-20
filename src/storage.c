@@ -91,13 +91,19 @@ MessageFileInfo loadMessageInfo(char *filename)
     return info;
 }
 
-// TODO: instead of filename, pass in a BluegraphStorage and bdaddr.
 void writeMessageInfo(MessageFileInfo info, char *bdaddr_dirname)
 {
     FILE *fp = NULL;
     char *messageFilename = NULL;
     char epochstr[21] = { 0 };
+    struct stat st = { 0 };
     if (!info) return;
+
+    if (stat(bdaddr_dirname, &st) == -1)
+    {
+        fprintf(stderr, "Creating %s\n", bdaddr_dirname);
+        mkdir(bdaddr_dirname, 0700);
+    }
 
     snprintf(epochstr, sizeof(epochstr), "%llu", info->time);
 
