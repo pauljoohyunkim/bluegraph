@@ -36,7 +36,6 @@ int serverTransaction(int s, BluegraphStorage storage)
     client = accept(s, (struct sockaddr *)&rem_addr, &opt);
     ba2str(&rem_addr.rc_bdaddr, (char *) buf);
     stringAddress2CompressedBDAddress(compressedBDAddress, buf);
-    // TODO: Free bdaddr_dir
     bdaddr_dir = calloc(strlen(storage->dir) + 2 + sizeof(compressedBDAddress), sizeof(char));
     strcpy(bdaddr_dir, storage->dir);
     strcat(bdaddr_dir, "/");
@@ -45,61 +44,71 @@ int serverTransaction(int s, BluegraphStorage storage)
     memset(buf, 0, sizeof(buf));
 
     status = read(client, buf, BLUEGRAPH_CHUNK_SIZE);
-    if (status > 0)
+    if (status <= 0)
     {
-        clientCapsule = packet2capsule(buf, status);
-        if (!clientCapsule) return -1;
-
-        switch (clientCapsule->type)
-        {
-            case BLUEGRAPH_CAPSULE_TYPE_SEND_MESSAGE_REQUEST:
-                // TODO: For now, send positive ack for all messages.
-                // TODO: For now, only handle text message.
-                messageFileInfo = calloc(1, sizeof(MessageFileInfo_st));
-                messageFileInfo->direction = BLUEGRAPH_INCOMING;
-                messageFileInfo->isText = clientCapsule->send_message_request_info.messageType == BLUEGRAPH_MESSAGE_TYPE_TEXT;
-                messageFileInfo->info = calloc(clientCapsule->send_message_request_info.msgLen, sizeof(uint8_t));
-                messageFileInfo->time = time(NULL);
-
-                serverCapsule = createCapsule();
-                serverCapsule->type = BLUEGRAPH_CAPSULE_TYPE_SEND_MESSAGE_REQUEST_ACK;
-                serverCapsule->send_message_request_ack_info.ack = true;
-                serverPacket = capsule2packet(serverCapsule, &serverPacketSize);
-                freeCapsule(serverCapsule);
-
-                status = write(client, serverPacket, serverPacketSize);
-                free(serverPacket);
-                if (status < 0)
-                {
-                    fprintf(stderr, "Could not send ack to client.\n");
-                    break;
-                }
-
-                // TODO: Getting packet from client
-                status = read(client, buf, BLUEGRAPH_CHUNK_SIZE);
-                if (status < 0)
-                {
-                    fprintf(stderr, "Could not get packet from client.\n");
-                    break;
-                }
-                clientCapsule = packet2capsule(buf, status);
-                if (!clientCapsule)
-                {
-                    fprintf(stderr, "Could not create packet from client.\n");
-                    freeCapsule(clientCapsule);
-                    break;
-                }
-                memcpy(messageFileInfo->info, clientCapsule->send_message_data_info.msg, clientCapsule->send_message_request_info.msgLen);
-                writeMessageInfo(messageFileInfo, bdaddr_dir);
-                freeCapsule(clientCapsule);
-                freeMessageInfo(messageFileInfo);
-                break;
-            default:
-                break;
-        }
-        printf("received [%s]\n", buf);
+        free(bdaddr_dir);
+        close(client);
+        return -1;
     }
+    clientCapsule = packet2capsule(buf, status);
+    if (!clientCapsule)
+    {
+        free(bdaddr_dir);
+        close(client);
+        return -1;
+    }
+
+    switch (clientCapsule->type)
+    {
+        case BLUEGRAPH_CAPSULE_TYPE_SEND_MESSAGE_REQUEST:
+            // TODO: For now, send positive ack for all messages.
+            // TODO: For now, only handle text message.
+            messageFileInfo = calloc(1, sizeof(MessageFileInfo_st));
+            messageFileInfo->direction = BLUEGRAPH_INCOMING;
+            messageFileInfo->isText = clientCapsule->send_message_request_info.messageType == BLUEGRAPH_MESSAGE_TYPE_TEXT;
+            messageFileInfo->info = calloc(clientCapsule->send_message_request_info.msgLen, sizeof(uint8_t));
+            messageFileInfo->time = time(NULL);
+
+            serverCapsule = createCapsule();
+            serverCapsule->type = BLUEGRAPH_CAPSULE_TYPE_SEND_MESSAGE_REQUEST_ACK;
+            serverCapsule->send_message_request_ack_info.ack = true;
+            serverPacket = capsule2packet(serverCapsule, &serverPacketSize);
+            freeCapsule(serverCapsule);
+
+            status = write(client, serverPacket, serverPacketSize);
+            free(serverPacket);
+            if (status < 0)
+            {
+                fprintf(stderr, "Could not send ack to client.\n");
+                break;
+            }
+
+            // TODO: Getting packet from client
+            status = read(client, buf, BLUEGRAPH_CHUNK_SIZE);
+            if (status < 0)
+            {
+                fprintf(stderr, "Could not get packet from client.\n");
+                break;
+            }
+            clientCapsule = packet2capsule(buf, status);
+            if (!clientCapsule)
+            {
+                fprintf(stderr, "Could not create packet from client.\n");
+                freeCapsule(clientCapsule);
+                break;
+            }
+            memcpy(messageFileInfo->info, clientCapsule->send_message_data_info.msg, clientCapsule->send_message_request_info.msgLen);
+            writeMessageInfo(messageFileInfo, bdaddr_dir);
+            freeCapsule(clientCapsule);
+            freeMessageInfo(messageFileInfo);
+            break;
+        default:
+            break;
+    }
+    printf("received [%s]\n", buf);
+    free(bdaddr_dir);
     close(client);
+    return status;
 }
 
 // Given a socket 's' with a valid connection, this function handles the transaction.
