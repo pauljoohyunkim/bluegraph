@@ -92,6 +92,7 @@ void startServer(BluegraphStorage storage)
     listen(s, 1);
 
     FD_ZERO(&currentDescriptors);
+    FD_SET(STDIN_FILENO, &currentDescriptors);
     FD_SET(s, &currentDescriptors);
     
     while (1)
@@ -109,6 +110,14 @@ void startServer(BluegraphStorage storage)
                 if (i == s)
                 {
                     serverTransaction(s, storage);
+                }
+                if (i == STDIN_FILENO)
+                {
+                    // TODO: Improve the handling input via stdin
+                    char buf[10];
+                    read(STDIN_FILENO, buf, 10);
+                    printf("%s\n", buf);
+                    memset(buf, 0, sizeof(buf));
                 }
             }
         }
