@@ -1,22 +1,20 @@
 #ifndef __CONN_H__
 #define __CONN_H__
 
+#include "device.h"
 #include "transaction.h"
 
-typedef struct
-{
-    char addr[19];
-    char name[248];
-} BluegraphDevice_st;
+struct BluegraphStorage_st;
+typedef struct BluegraphStorage_st *BluegraphStorage;
 
-typedef BluegraphDevice_st *BluegraphDevice;
+// Declaration
 
 // Discovery
 BluegraphDevice *discoverDevices(int len, int *nDevices);
 void freeBluegraphDevices(BluegraphDevice *devices, int nDevices);
 
 // Server
-void startServer();
+void startServer(BluegraphStorage storage);
 // Client
 void clientConnect(const char *serverAddress, Transaction transaction);
 
