@@ -1,6 +1,7 @@
 #ifndef __CONN_H__
 #define __CONN_H__
 
+#include "storage.h"
 #include "transaction.h"
 
 typedef struct
@@ -16,7 +17,7 @@ BluegraphDevice *discoverDevices(int len, int *nDevices);
 void freeBluegraphDevices(BluegraphDevice *devices, int nDevices);
 
 // Server
-void startServer();
+void startServer(BluegraphStorage storage);
 // Client
 void clientConnect(const char *serverAddress, Transaction transaction);
 
