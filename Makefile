@@ -16,5 +16,7 @@ test/addresstranslationtest: test/addresstranslationtest.c src/storage.c
 	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
 test/test: test/test.c
 	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
+obj/%.o: src/%.c
+	$(CC) $(CFLAGS) -c $< -o $@ $(LDFLAGS)
 clean:
 	rm -f test/*test

@@ -3,31 +3,42 @@
 
 #include <stdlib.h>
 #include <time.h>
+#include "device.h"
+#include "common.h"
 #include "conn.h"
 
-typedef struct
+
+// Declaration
+struct FileList_st;
+typedef struct FileList_st FileList_st;
+typedef struct FileList_st *FileList;
+
+struct BluegraphChat_st;
+typedef struct BluegraphChat_st BluegraphChat_st;
+typedef struct BluegraphChat_st *BluegraphChat;
+
+struct MessageFileInfo_st;
+typedef struct MessageFileInfo_st MessageFileInfo_st;
+typedef struct MessageFileInfo_st *MessageFileInfo;
+
+struct FileList_st
 {
     char **filenames;
     size_t size;
     size_t capacity;
-} FileList_st;
+};
 
-typedef FileList_st *FileList;
-
-typedef struct
+struct BluegraphStorage_st
 {
     char *dir;
     FileList chatdirs;
-} BluegraphStorage_st;
+};
 
-typedef BluegraphStorage_st *BluegraphStorage;
-
-typedef struct
+struct BluegraphChat_st
 {
     BluegraphDevice contact;
     FileList chatfiles;
-} BluegraphChat_st;
-typedef BluegraphChat_st *BluegraphChat;
+};
 
 typedef enum
 {
@@ -35,7 +46,7 @@ typedef enum
     BLUEGRAPH_OUTGOING
 } MessageDirection;
 
-typedef struct
+struct MessageFileInfo_st
 {
     time_t time;
     MessageDirection direction;
@@ -43,8 +54,7 @@ typedef struct
     // If isText == true, then info is the content of the message.
     // Otherwise it is the name of the file.
     char *info;
-} MessageFileInfo_st;
-typedef MessageFileInfo_st *MessageFileInfo;
+};
 
 FileList createFileList();
 void addToFileList(FileList filelist, char *filename);

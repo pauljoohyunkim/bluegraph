@@ -3,7 +3,8 @@
 
 #include <stdint.h>
 #include <stddef.h>
-#include "storage.h"
+#include "device.h"
+#include "common.h"
 
 /*
 For BLUEGRAPH_TRANSACTION_TYPE_SEND_MESSAGE,

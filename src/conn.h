@@ -1,16 +1,13 @@
 #ifndef __CONN_H__
 #define __CONN_H__
 
-#include "storage.h"
+#include "device.h"
 #include "transaction.h"
 
-typedef struct
-{
-    char addr[18];
-    char name[248];
-} BluegraphDevice_st;
+struct BluegraphStorage_st;
+typedef struct BluegraphStorage_st *BluegraphStorage;
 
-typedef BluegraphDevice_st *BluegraphDevice;
+// Declaration
 
 // Discovery
 BluegraphDevice *discoverDevices(int len, int *nDevices);
