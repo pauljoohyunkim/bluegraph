@@ -74,7 +74,7 @@ void freeBluegraphDevices(BluegraphDevice *devices, int nDevices)
     free(devices);
 }
 
-void startServer()
+void startServer(BluegraphStorage storage)
 {
     struct sockaddr_rc loc_addr = { 0 };
     int s;
@@ -90,7 +90,7 @@ void startServer()
     
     while (1)
     {
-        serverTransaction(s);
+        serverTransaction(s, storage);
     }
     
     close(s);

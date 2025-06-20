@@ -1,6 +1,10 @@
 #include "../src/conn.h"
+#include "../src/storage.h"
 
 int main()
 {
-    startServer();
+    BluegraphStorage storage = bluegraph_load_storage();
+    startServer(storage);
+
+    return 0;
 }
