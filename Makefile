@@ -19,4 +19,5 @@ test/test: test/test.c
 obj/%.o: src/%.c
 	$(CC) $(CFLAGS) -c $< -o $@ $(LDFLAGS)
 clean:
-	rm -f test/*test
+	$(RM) test/*test
+	$(RM) -r obj/* bin/* ~/.bluegraph/*
