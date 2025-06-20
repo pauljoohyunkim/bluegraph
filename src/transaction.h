@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#include "storage.h"
 
 /*
 For BLUEGRAPH_TRANSACTION_TYPE_SEND_MESSAGE,
@@ -40,7 +41,7 @@ typedef struct
 typedef Transaction_st *Transaction;
 
 Transaction createTransaction();
-int serverTransaction(int s);
+int serverTransaction(int s, BluegraphStorage storage);
 int clientTransaction(Transaction transaction, int s);
 
 #endif

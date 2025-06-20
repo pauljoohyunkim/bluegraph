@@ -18,7 +18,7 @@ Transaction createTransaction()
 
 // Given a socket 's' with a valid connection, this function handles the transaction.
 // Returns -1 on error
-int serverTransaction(int s)
+int serverTransaction(int s, BluegraphStorage storage)
 {
     struct sockaddr_rc rem_addr = { 0 };
     int status = 0;
@@ -84,7 +84,7 @@ int serverTransaction(int s)
                     break;
                 }
                 memcpy(messageFileInfo->info, clientCapsule->send_message_data_info.msg, clientCapsule->send_message_request_info.msgLen);
-                writeMessageInfo(messageFileInfo, "/home/pbjk/.bluegraph/123124132441/test2.txt");
+                writeMessageInfo(messageFileInfo, "/home/pbjk/.bluegraph/123124132441");
                 freeCapsule(clientCapsule);
                 freeMessageInfo(messageFileInfo);
                 break;
