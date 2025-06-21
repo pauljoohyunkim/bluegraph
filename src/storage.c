@@ -350,7 +350,7 @@ void stringAddress2CompressedBDAddress(char *compressedBDAddress, char *stringAd
     int j = 0;
     if (!stringAddress || !compressedBDAddress) return;
 
-    memset(compressedBDAddress, 0, 13);
+    memset(compressedBDAddress, 0, 12);
 
     while (i < 18)
     {

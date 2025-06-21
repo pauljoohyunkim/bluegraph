@@ -2,6 +2,7 @@
 #define __STORAGE_H__
 
 #include <stdlib.h>
+#include <stdbool.h>
 #include <time.h>
 #include "device.h"
 #include "common.h"
