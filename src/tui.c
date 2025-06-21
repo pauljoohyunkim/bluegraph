@@ -59,7 +59,7 @@ void loadRecipients(BluegraphWindow window, BluegraphStorage storage)
         compressedBDAddress2StringAddress(window->bdaddr[i], storage->chatdirs->filenames[i]);
         if (i < window->startIndex) continue;
 
-        if (i + 2 < window->height)
+        if (i + 2 < window->startIndex + window->height)
         {
             if (window->selectedIndex == i)
             {
@@ -85,7 +85,7 @@ void redrawRecipients(BluegraphWindow window)
     {
         if (i < window->startIndex) continue;
 
-        if (i + 2 < window->height)
+        if (i + 2 < window->startIndex + window->height)
         {
             if (window->selectedIndex == i)
             {
@@ -111,14 +111,14 @@ void navigateRecipients(BluegraphWindow window)
         switch (ch)
         {
             case KEY_DOWN:
-                //if (window->startIndex + window->height - 3 == window->selectedIndex)
-                //{
-                //    window->startIndex++;
-                //}
                 // Moving selection
                 if (window->selectedIndex + 1 != window->nBdaddr)
                 {
                     window->selectedIndex++;
+                }
+                if (window->selectedIndex > window->startIndex + window->height - 3)
+                {
+                    window->startIndex++;
                 }
                 redrawRecipients(window);
             case KEY_UP:
