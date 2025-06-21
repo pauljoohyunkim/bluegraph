@@ -22,6 +22,7 @@ BluegraphWindow bluegraph_initialize_tui()
     raw();
     keypad(stdscr, TRUE);
     noecho();
+    curs_set(0);
 
     // Get terminal size.
     getmaxyx(stdscr, terminal_y, terminal_x);
@@ -41,6 +42,7 @@ BluegraphWindow bluegraph_initialize_tui()
     refresh();
 
     box(windows->helpbar, 0, 0);
+    //mvwprintw(windows->helpbar, 1, 1, "Help: ");
     wrefresh(windows->helpbar);
 
     return windows;
