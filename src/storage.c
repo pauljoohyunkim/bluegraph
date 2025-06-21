@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <sys/stat.h>
 #include <dirent.h>
+#include <time.h>
 #include "storage.h"
 
 static bool isCompressedBDAddress(char *dirname);
@@ -67,6 +68,7 @@ MessageFileInfo loadMessageInfo(char *filename)
     size_t bytes = 0;
     size_t filesize = 0;
     char *epochstr = NULL;
+    time_t epoch = 0;
 
     fp = fopen(filename, "r");
     if (fp == NULL) return NULL;
@@ -76,6 +78,7 @@ MessageFileInfo loadMessageInfo(char *filename)
     if (!epochstr) return NULL;
     epochstr += 1;
     // TODO: parse epochstr to time value.
+    epoch = strtoll(epochstr, NULL, 10);
 
     // Determine file size
     fseek(fp, 0, SEEK_END);
@@ -86,6 +89,7 @@ MessageFileInfo loadMessageInfo(char *filename)
     // Read the first two bytes to determine its direction, and whether it is a text message.
     bytes = fread(&(info->direction), sizeof(uint8_t), 1, fp);
     bytes = fread(&(info->isText), sizeof(uint8_t), 1, fp);
+    info->time = epoch;
     if (bytes == 0 || (info->direction != BLUEGRAPH_INCOMING && info->direction != BLUEGRAPH_OUTGOING))
     {
         fclose(fp);
