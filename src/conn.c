@@ -115,12 +115,13 @@ void startServer(BluegraphStorage storage)
                 if (i == STDIN_FILENO)
                 {
                     char bdaddr[18];
-                    char compressedBDAddr[12];
+                    char compressedBDAddr[13];
                     char buf[BUFSIZ];
                     Transaction transaction;
 
                     read(STDIN_FILENO, buf, sizeof(buf));
                     strncpy(bdaddr, buf, sizeof(bdaddr));
+                    bdaddr[17] = 0;
                     stringAddress2CompressedBDAddress(compressedBDAddr, bdaddr);
 
                     // Building transaction
