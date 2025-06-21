@@ -8,6 +8,7 @@
 #include "capsule.h"
 #include "conn.h"
 #include "transaction.h"
+#include "storage.h"
 
 // Creates List of BluegraphDevice
 // Inquires for 1.28 * len seconds.
@@ -113,10 +114,26 @@ void startServer(BluegraphStorage storage)
                 }
                 if (i == STDIN_FILENO)
                 {
-                    // TODO: Improve the handling input via stdin
-                    char buf[10];
-                    read(STDIN_FILENO, buf, 10);
+                    char bdaddr[18];
+                    char compressedBDAddr[12];
+                    char buf[BUFSIZ];
+                    Transaction transaction;
+
+                    read(STDIN_FILENO, buf, sizeof(buf));
+                    strncpy(bdaddr, buf, sizeof(bdaddr));
+                    stringAddress2CompressedBDAddress(compressedBDAddr, bdaddr);
+
+                    // Building transaction
+                    transaction = createTransaction();
+                    transaction->type = BLUEGRAPH_TRANSACTION_TYPE_SEND_MESSAGE;
+                    transaction->send_message_info.sourceType = BLUEGRAPH_MESSAGE_SOURCE_BUFFER;
+                    transaction->send_message_info.messageLen = strlen(buf) - sizeof(bdaddr);
+                    transaction->send_message_info.source = buf + sizeof(bdaddr);
+                    clientConnect(bdaddr, transaction);
+                    free(transaction);
+                    
                     printf("%s\n", buf);
+
                     memset(buf, 0, sizeof(buf));
                 }
             }
