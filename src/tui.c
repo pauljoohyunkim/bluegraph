@@ -102,6 +102,33 @@ void redrawRecipients(BluegraphWindow window)
     wrefresh(window->win);
 }
 
+void navigateRecipients(BluegraphWindow window)
+{
+    int ch;
+
+    while ((ch = getch()) != 'q')
+    {
+        switch (ch)
+        {
+            case KEY_DOWN:
+                //if (window->startIndex + window->height - 3 == window->selectedIndex)
+                //{
+                //    window->startIndex++;
+                //}
+                // Moving selection
+                if (window->selectedIndex + 1 != window->nBdaddr)
+                {
+                    window->selectedIndex++;
+                }
+                redrawRecipients(window);
+            case KEY_UP:
+                break;
+            default:
+                break;
+        }
+    }
+}
+
 void freeRecipients(BluegraphWindow window)
 {
     for (size_t i = 0; i < window->nBdaddr; i++)

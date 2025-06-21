@@ -12,10 +12,8 @@ int main()
 	// Load to windows
 	loadRecipients(window, storage);
 
-	getch();
-	window->startIndex += 1;
-	redrawRecipients(window);
-	getch();
+	navigateRecipients(window);
+	
 	freeRecipients(window);
 	bluegraph_end_tui(window);
 	freeBluegraphStorage(storage);
