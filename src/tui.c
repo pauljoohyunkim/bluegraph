@@ -124,9 +124,15 @@ void navigateRecipients(BluegraphWindow window)
                 redrawRecipients(window);
                 break;
             case KEY_UP:
+                // Moving selection
                 if (window->selectedIndex != 0)
                 {
                     window->selectedIndex--;
+                }
+                // Scrolling
+                if (window->selectedIndex < window->startIndex)
+                {
+                    window->startIndex--;
                 }
                 redrawRecipients(window);
                 break;
