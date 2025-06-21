@@ -2,6 +2,7 @@
 #define __STORAGE_H__
 
 #include <stdlib.h>
+#include <stdbool.h>
 #include <time.h>
 #include "device.h"
 #include "common.h"
@@ -61,10 +62,12 @@ void addToFileList(FileList filelist, char *filename);
 void freeFileList(FileList filelist);
 
 MessageFileInfo loadMessageInfo(char *filename);
+void dumpMessageInfo(MessageFileInfo info, char *bdaddr);
 void writeMessageInfo(MessageFileInfo info, char *bdaddr_dirname);
 void freeMessageInfo(MessageFileInfo info);
 
 BluegraphChat loadBluegraphChat(char *bdaddr_dirname);
+void dumpChat(char *bdaddr_dirname);
 void freeBluegraphChat(BluegraphChat chat);
 
 BluegraphStorage bluegraph_load_storage();

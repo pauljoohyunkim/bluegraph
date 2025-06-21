@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <sys/stat.h>
 #include <dirent.h>
+#include <time.h>
 #include "storage.h"
 
 static bool isCompressedBDAddress(char *dirname);
@@ -59,15 +60,25 @@ void freeFileList(FileList filelist)
 }
 
 // TODO: Get time value.
+// Given full filename, returns MessageFileInfo of the message.
 MessageFileInfo loadMessageInfo(char *filename)
 {
     MessageFileInfo info = NULL;
     FILE *fp = NULL;
     size_t bytes = 0;
     size_t filesize = 0;
+    char *epochstr = NULL;
+    time_t epoch = 0;
 
     fp = fopen(filename, "r");
     if (fp == NULL) return NULL;
+
+    // epochstr is the basename for the filename given.
+    epochstr = strrchr(filename, '/');
+    if (!epochstr) return NULL;
+    epochstr += 1;
+    // TODO: parse epochstr to time value.
+    epoch = strtoll(epochstr, NULL, 10);
 
     // Determine file size
     fseek(fp, 0, SEEK_END);
@@ -78,6 +89,7 @@ MessageFileInfo loadMessageInfo(char *filename)
     // Read the first two bytes to determine its direction, and whether it is a text message.
     bytes = fread(&(info->direction), sizeof(uint8_t), 1, fp);
     bytes = fread(&(info->isText), sizeof(uint8_t), 1, fp);
+    info->time = epoch;
     if (bytes == 0 || (info->direction != BLUEGRAPH_INCOMING && info->direction != BLUEGRAPH_OUTGOING))
     {
         fclose(fp);
@@ -90,6 +102,35 @@ MessageFileInfo loadMessageInfo(char *filename)
     fclose(fp);
 
     return info;
+}
+
+void dumpMessageInfo(MessageFileInfo info, char *bdaddr)
+{
+    time_t time;
+    struct tm *datetime;
+
+    if (!info) return;
+
+    datetime = localtime(&time);
+    printf("%s", asctime(datetime));
+
+    if (info->direction == BLUEGRAPH_INCOMING)
+    {
+        printf("%s -> Me\n", bdaddr);
+    }
+    else
+    {
+        printf("Me -> %s\n", bdaddr);
+    }
+
+    if (info->isText)
+    {
+        printf("%s\n", info->info);
+    }
+    else
+    {
+        // TODO: Show link to the file path.
+    }
 }
 
 void writeMessageInfo(MessageFileInfo info, char *bdaddr_dirname)
@@ -168,6 +209,39 @@ BluegraphChat loadBluegraphChat(char *bdaddr_dirname)
         strcat(filename, op->d_name);
         stat(filename, &filestat);
         addToFileList(chat->chatfiles, op->d_name);
+        free(filename);
+    }
+    closedir(dp);
+}
+
+void dumpChat(char *bdaddr_dirname)
+{
+    char *bdaddrCompressed = NULL;
+    char bdaddr[18] = { 0 };
+    DIR *dp = NULL;
+    struct dirent *op = NULL;
+
+    bdaddrCompressed = strrchr(bdaddr_dirname, '/');
+    if (!bdaddrCompressed) return;
+    bdaddrCompressed += 1;
+    compressedBDAddress2StringAddress(bdaddr, bdaddrCompressed);
+
+    // Get file list, then dump each message.
+    dp = opendir(bdaddr_dirname);
+    while ((op = readdir(dp)) != NULL)
+    {
+        char *filename = NULL;
+        MessageFileInfo info = NULL;
+        if (strcmp(op->d_name, ".") == 0 || strcmp(op->d_name, "..") == 0)
+            continue;
+        filename = calloc(strlen(op->d_name) + strlen(bdaddr_dirname) + 2, sizeof(char));
+        strcpy(filename, bdaddr_dirname);
+        strcat(filename, "/");
+        strcat(filename, op->d_name);
+
+        info = loadMessageInfo(filename);
+        dumpMessageInfo(info, bdaddr);
+        freeMessageInfo(info);
         free(filename);
     }
     closedir(dp);
@@ -276,7 +350,7 @@ void stringAddress2CompressedBDAddress(char *compressedBDAddress, char *stringAd
     int j = 0;
     if (!stringAddress || !compressedBDAddress) return;
 
-    memset(compressedBDAddress, 0, 13);
+    memset(compressedBDAddress, 0, 12);
 
     while (i < 18)
     {

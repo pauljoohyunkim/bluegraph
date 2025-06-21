@@ -102,9 +102,12 @@ void redrawRecipients(BluegraphWindow window)
     wrefresh(window->win);
 }
 
-void navigateRecipients(BluegraphWindow window)
+void navigateRecipients(BluegraphWindow window, BluegraphStorage storage)
 {
     int ch;
+    char *bdaddr_dir = NULL;
+    char compressedBDAddr[12] = { 0 };
+    char bdaddr[18] = { 0 };
 
     while ((ch = getch()) != 'q')
     {
@@ -142,6 +145,15 @@ void navigateRecipients(BluegraphWindow window)
                 endwin();
 
                 // Load chat and interact
+                bdaddr_dir = calloc(strlen(storage->dir) + 2 + sizeof(compressedBDAddr), sizeof(char));
+                strcpy(bdaddr, window->bdaddr[window->selectedIndex]);
+                stringAddress2CompressedBDAddress(compressedBDAddr, bdaddr);
+
+                strcpy(bdaddr_dir, storage->dir);
+                strcat(bdaddr_dir, "/");
+                strcat(bdaddr_dir, compressedBDAddr);
+                dumpChat(bdaddr_dir);
+                free(bdaddr_dir);
 
                 // Restore ncurses
                 reset_prog_mode();

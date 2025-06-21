@@ -12,7 +12,7 @@ int main()
 	// Load to windows
 	loadRecipients(window, storage);
 
-	navigateRecipients(window);
+	navigateRecipients(window, storage);
 	
 	freeRecipients(window);
 	bluegraph_end_tui(window);
