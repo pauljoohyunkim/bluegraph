@@ -7,6 +7,7 @@
 #include <bluetooth/rfcomm.h>
 #include "capsule.h"
 #include "conn.h"
+#include "storage.h"
 #include "transaction.h"
 
 // Creates List of BluegraphDevice
@@ -75,7 +76,7 @@ void freeBluegraphDevices(BluegraphDevice *devices, int nDevices)
     free(devices);
 }
 
-void startServer(BluegraphStorage storage)
+void startServer(BluegraphStorage storage, char *bdaddr)
 {
     struct sockaddr_rc loc_addr = { 0 };
     int s;
@@ -113,10 +114,34 @@ void startServer(BluegraphStorage storage)
                 }
                 if (i == STDIN_FILENO)
                 {
-                    // TODO: Improve the handling input via stdin
-                    char buf[10];
-                    read(STDIN_FILENO, buf, 10);
+                    Transaction transaction = NULL;
+                    MessageFileInfo info = NULL;
+                    char buf[BUFSIZ];
+                    char compressedBDAddr[12];
+                    char *filename = NULL;
+
+                    read(STDIN_FILENO, buf, BUFSIZ);
                     printf("%s\n", buf);
+                    transaction = createTransaction();
+                    transaction->type = BLUEGRAPH_TRANSACTION_TYPE_SEND_MESSAGE;
+                    transaction->send_message_info.sourceType = BLUEGRAPH_MESSAGE_SOURCE_BUFFER;
+                    transaction->send_message_info.messageLen = strlen(buf);
+                    clientConnect(bdaddr, transaction);
+                    info = calloc(1, sizeof(MessageFileInfo_st));
+                    info->time = time(NULL);
+                    info->direction = BLUEGRAPH_OUTGOING;
+                    info->isText = true;
+                    info->info = buf;
+                    filename = calloc(strlen(storage->dir) + 2 + 12, sizeof(char));
+                    stringAddress2CompressedBDAddress(compressedBDAddr, bdaddr);
+                    strcpy(filename, storage->dir);
+                    strcat(filename, "/");
+                    strcat(filename, compressedBDAddr);
+                    writeMessageInfo(info, filename);
+                    free(filename);
+                    freeMessageInfo(info);
+                    free(transaction);
+
                     memset(buf, 0, sizeof(buf));
                 }
             }

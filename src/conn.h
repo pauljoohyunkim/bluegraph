@@ -14,7 +14,7 @@ BluegraphDevice *discoverDevices(int len, int *nDevices);
 void freeBluegraphDevices(BluegraphDevice *devices, int nDevices);
 
 // Server
-void startServer(BluegraphStorage storage);
+void startServer(BluegraphStorage storage, char *bdaddr);
 // Client
 void clientConnect(const char *serverAddress, Transaction transaction);
 

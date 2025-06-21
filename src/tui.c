@@ -154,6 +154,8 @@ void navigateRecipients(BluegraphWindow window, BluegraphStorage storage)
                 strcat(bdaddr_dir, compressedBDAddr);
                 dumpChat(bdaddr_dir);
                 free(bdaddr_dir);
+                
+                startServer(storage);
 
                 // Restore ncurses
                 reset_prog_mode();
