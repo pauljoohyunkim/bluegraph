@@ -33,6 +33,7 @@ typedef BluegraphWindow_st *BluegraphWindow;
 
 BluegraphWindow bluegraph_initialize_tui();
 void loadRecipients(BluegraphWindow window, BluegraphStorage storage);
+void redrawRecipients(BluegraphWindow window);
 void freeRecipients(BluegraphWindow window);
 void bluegraph_end_tui(BluegraphWindow windows);
 
