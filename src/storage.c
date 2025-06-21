@@ -59,15 +59,23 @@ void freeFileList(FileList filelist)
 }
 
 // TODO: Get time value.
+// Given full filename, returns MessageFileInfo of the message.
 MessageFileInfo loadMessageInfo(char *filename)
 {
     MessageFileInfo info = NULL;
     FILE *fp = NULL;
     size_t bytes = 0;
     size_t filesize = 0;
+    char *epochstr = NULL;
 
     fp = fopen(filename, "r");
     if (fp == NULL) return NULL;
+
+    // epochstr is the basename for the filename given.
+    epochstr = strrchr(filename, '/');
+    if (!epochstr) return NULL;
+    epochstr += 1;
+    // TODO: parse epochstr to time value.
 
     // Determine file size
     fseek(fp, 0, SEEK_END);
