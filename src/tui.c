@@ -57,19 +57,22 @@ void loadRecipients(BluegraphWindow window, BluegraphStorage storage)
     {
         window->bdaddr[i] = calloc(18, sizeof(char));
         compressedBDAddress2StringAddress(window->bdaddr[i], storage->chatdirs->filenames[i]);
-        if (window->startIndex + i + 2 < window->height)
+        if (i < window->startIndex) continue;
+
+        if (i + 2 < window->height)
         {
-            if (window->selectedIndex == i + window->startIndex)
+            if (window->selectedIndex == i)
             {
                 wattron(window->win, A_BOLD);
-                mvwprintw(window->win, i + 1, 1, window->bdaddr[i + window->startIndex]);
+                mvwprintw(window->win, i + 1 - window->startIndex, 1, window->bdaddr[i]);
                 wattroff(window->win, A_BOLD);
             }
             else
             {
-                mvwprintw(window->win, i + 1, 1, window->bdaddr[i + window->startIndex]);
+                mvwprintw(window->win, i + 1 - window->startIndex, 1, window->bdaddr[i]);
             }
         }
+        
     }
     wrefresh(window->win);
 }
@@ -80,17 +83,19 @@ void redrawRecipients(BluegraphWindow window)
     box(window->win, 0, 0);
     for (size_t i = 0; i < window->nBdaddr; i++)
     {
-        if (window->startIndex + i + 2 < window->height)
+        if (i < window->startIndex) continue;
+
+        if (i + 2 < window->height)
         {
-            if (window->selectedIndex == i + window->startIndex)
+            if (window->selectedIndex == i)
             {
                 wattron(window->win, A_BOLD);
-                mvwprintw(window->win, i + 1, 1, window->bdaddr[i + window->startIndex]);
+                mvwprintw(window->win, i + 1 - window->startIndex, 1, window->bdaddr[i]);
                 wattroff(window->win, A_BOLD);
             }
             else
             {
-                mvwprintw(window->win, i + 1, 1, window->bdaddr[i + window->startIndex]);
+                mvwprintw(window->win, i + 1 - window->startIndex, 1, window->bdaddr[i]);
             }
         }
     }
