@@ -104,6 +104,35 @@ MessageFileInfo loadMessageInfo(char *filename)
     return info;
 }
 
+void dumpMessageInfo(MessageFileInfo info, char *bdaddr)
+{
+    time_t time;
+    struct tm *datetime;
+
+    if (!info) return;
+
+    datetime = localtime(&time);
+    printf("%s", asctime(datetime));
+
+    if (info->direction == BLUEGRAPH_INCOMING)
+    {
+        printf("%s -> Me\n", bdaddr);
+    }
+    else
+    {
+        printf("Me -> %s\n", bdaddr);
+    }
+
+    if (info->isText)
+    {
+        printf("%s\n", info->info);
+    }
+    else
+    {
+        // TODO: Show link to the file path.
+    }
+}
+
 void writeMessageInfo(MessageFileInfo info, char *bdaddr_dirname)
 {
     FILE *fp = NULL;

@@ -61,6 +61,7 @@ void addToFileList(FileList filelist, char *filename);
 void freeFileList(FileList filelist);
 
 MessageFileInfo loadMessageInfo(char *filename);
+void dumpMessageInfo(MessageFileInfo info, char *bdaddr);
 void writeMessageInfo(MessageFileInfo info, char *bdaddr_dirname);
 void freeMessageInfo(MessageFileInfo info);
 
