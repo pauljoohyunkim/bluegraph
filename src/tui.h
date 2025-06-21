@@ -27,6 +27,7 @@ typedef struct
     char **bdaddr;
     size_t nBdaddr;
     int startIndex;
+    int selectedIndex;
 } BluegraphWindow_st;
 
 typedef BluegraphWindow_st *BluegraphWindow;

@@ -58,7 +58,18 @@ void loadRecipients(BluegraphWindow window, BluegraphStorage storage)
         window->bdaddr[i] = calloc(18, sizeof(char));
         compressedBDAddress2StringAddress(window->bdaddr[i], storage->chatdirs->filenames[i]);
         if (window->startIndex + i + 2 < window->height)
-            mvwprintw(window->win, i + 1, 1, window->bdaddr[i + window->startIndex]);
+        {
+            if (window->selectedIndex == i + window->startIndex)
+            {
+                wattron(window->win, A_BOLD);
+                mvwprintw(window->win, i + 1, 1, window->bdaddr[i + window->startIndex]);
+                wattroff(window->win, A_BOLD);
+            }
+            else
+            {
+                mvwprintw(window->win, i + 1, 1, window->bdaddr[i + window->startIndex]);
+            }
+        }
     }
     wrefresh(window->win);
 }
@@ -70,7 +81,18 @@ void redrawRecipients(BluegraphWindow window)
     for (size_t i = 0; i < window->nBdaddr; i++)
     {
         if (window->startIndex + i + 2 < window->height)
-            mvwprintw(window->win, i + 1, 1, window->bdaddr[i + window->startIndex]);
+        {
+            if (window->selectedIndex == i + window->startIndex)
+            {
+                wattron(window->win, A_BOLD);
+                mvwprintw(window->win, i + 1, 1, window->bdaddr[i + window->startIndex]);
+                wattroff(window->win, A_BOLD);
+            }
+            else
+            {
+                mvwprintw(window->win, i + 1, 1, window->bdaddr[i + window->startIndex]);
+            }
+        }
     }
     wrefresh(window->win);
 }

@@ -27,4 +27,6 @@ obj/%.o: src/%.c
 	$(CC) $(CFLAGS) -c $< -o $@ $(LDFLAGS)
 clean:
 	$(RM) test/*test
-	$(RM) -r obj/* bin/* ~/.bluegraph/*
+	$(RM) -r obj/* bin/*
+full-clean: clean
+	$(RM) ~/.bluegraph/*
