@@ -57,7 +57,10 @@ void loadRecipients(BluegraphWindow window, BluegraphStorage storage)
     {
         window->bdaddr[i] = calloc(18, sizeof(char));
         compressedBDAddress2StringAddress(window->bdaddr[i], storage->chatdirs->filenames[i]);
+        if (window->startIndex + i + 2 < window->height)
+            mvwprintw(window->win, i + 1, 1, window->bdaddr[i]);
     }
+    wrefresh(window->win);
 }
 
 void freeRecipients(BluegraphWindow window)
