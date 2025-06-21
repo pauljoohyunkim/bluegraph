@@ -155,8 +155,6 @@ void navigateRecipients(BluegraphWindow window, BluegraphStorage storage)
                 dumpChat(bdaddr_dir);
                 free(bdaddr_dir);
 
-                exit(1);
-
                 // Restore ncurses
                 reset_prog_mode();
                 refresh();
