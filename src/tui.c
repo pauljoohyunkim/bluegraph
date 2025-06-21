@@ -136,6 +136,17 @@ void navigateRecipients(BluegraphWindow window)
                 }
                 redrawRecipients(window);
                 break;
+            case '\n':
+                // Temporarily exit ncurses
+                def_prog_mode();
+                endwin();
+
+                // Load chat and interact
+
+                // Restore ncurses
+                reset_prog_mode();
+                refresh();
+                break;
             default:
                 break;
         }
