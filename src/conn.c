@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <unistd.h>
+#include <sys/select.h>
 #include <bluetooth/bluetooth.h>
 #include <bluetooth/hci.h>
 #include <bluetooth/hci_lib.h>
@@ -78,6 +79,8 @@ void startServer(BluegraphStorage storage)
 {
     struct sockaddr_rc loc_addr = { 0 };
     int s;
+    fd_set currentDescriptors;
+    fd_set readyDescriptors;
     
     s = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
 
@@ -87,10 +90,38 @@ void startServer(BluegraphStorage storage)
     loc_addr.rc_channel = (uint8_t) BLUEGRAPH_DEFAULT_PORT;
     bind(s, (struct sockaddr *)&loc_addr, sizeof(loc_addr));
     listen(s, 1);
+
+    FD_ZERO(&currentDescriptors);
+    FD_SET(STDIN_FILENO, &currentDescriptors);
+    FD_SET(s, &currentDescriptors);
     
     while (1)
     {
-        serverTransaction(s, storage);
+        readyDescriptors = currentDescriptors;
+        if (select(FD_SETSIZE, &readyDescriptors, NULL, NULL, NULL) < 0)
+        {
+            fprintf(stderr, "Select error.\n");
+            continue;
+        }
+        for (int i = 0; i < FD_SETSIZE; i++)
+        {
+            if (FD_ISSET(i, &readyDescriptors))
+            {
+                if (i == s)
+                {
+                    serverTransaction(s, storage);
+                }
+                if (i == STDIN_FILENO)
+                {
+                    // TODO: Improve the handling input via stdin
+                    char buf[10];
+                    read(STDIN_FILENO, buf, 10);
+                    printf("%s\n", buf);
+                    memset(buf, 0, sizeof(buf));
+                }
+            }
+        }
+            
     }
     
     close(s);
