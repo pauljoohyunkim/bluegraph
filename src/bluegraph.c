@@ -3,10 +3,7 @@
 
 int main()
 {
-	WINDOW *lwin = NULL;
-	WINDOW *rwin_up = NULL;
-	WINDOW *rwin_down = NULL;
-	BluegraphWindows windows = NULL;
+	BluegraphWindow windows = NULL;
 	windows = bluegraph_initialize_tui();
 
 	getch();

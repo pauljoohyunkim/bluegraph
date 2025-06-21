@@ -3,7 +3,7 @@ CFLAGS=-g -Wall
 LDFLAGS=-lbluetooth -lncurses
 BIN=bluegraph
 
-bin: obj/bluegraph.o obj/conn.o obj/transaction.o obj/capsule.o obj/tui.o
+bin: obj/bluegraph.o obj/conn.o obj/transaction.o obj/capsule.o obj/tui.o obj/storage.o
 	$(CC) $(CFLAGS) $^ -o bin/$(BIN) $(LDFLAGS)
 
 obj/%.o: src/%.c

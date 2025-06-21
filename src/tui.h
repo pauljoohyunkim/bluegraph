@@ -3,27 +3,36 @@
 
 #include <ncurses.h>
 
-// TUI: One large LHS box. Two RHS boxes where the second one is on the bottom for messaging.
+// TUI : Recipient Selection Window, so a single window with a list of bdaddr,
+// and a single-row box for help.
+// Rest of the messaging will be done in console.
 
 #define MARGIN_L 5
 #define MARGIN_R 5
 #define MARGIN_T 5
 #define MARGIN_B 5
-#define MARGIN_BETWEEN_HORIZONTAL 5
 #define MARGIN_BETWEEN_VERTICAL 1
-#define RWIN_MESSAGE_BOX_HEIGHT 4
+#define HELPBOX_HEIGHT 3
 
 typedef struct
 {
-    WINDOW *lwin;
-    WINDOW *rwin_up;
-    WINDOW *rwin_down;
-} BluegraphWindows_st;
+    WINDOW *win;
+    WINDOW *helpbar;
+    int height;
+    int width;
+    int y;
+    int x;
+    
+    char *bdaddr[18];
+    size_t nBdaddr;
+    size_t capacity;
+    int startIndex;
+} BluegraphWindow_st;
 
-typedef BluegraphWindows_st *BluegraphWindows;
+typedef BluegraphWindow_st *BluegraphWindow;
 
-BluegraphWindows bluegraph_initialize_tui();
-void bluegraph_end_tui(BluegraphWindows windows);
+BluegraphWindow bluegraph_initialize_tui();
+void bluegraph_end_tui(BluegraphWindow windows);
 
 
 #endif
