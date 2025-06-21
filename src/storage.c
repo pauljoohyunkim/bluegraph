@@ -214,6 +214,39 @@ BluegraphChat loadBluegraphChat(char *bdaddr_dirname)
     closedir(dp);
 }
 
+void dumpChat(char *bdaddr_dirname)
+{
+    char *bdaddrCompressed = NULL;
+    char bdaddr[18] = { 0 };
+    DIR *dp = NULL;
+    struct dirent *op = NULL;
+
+    bdaddrCompressed = strrchr(bdaddr_dirname, '/');
+    if (!bdaddrCompressed) return;
+    bdaddrCompressed += 1;
+    compressedBDAddress2StringAddress(bdaddr, bdaddrCompressed);
+
+    // Get file list, then dump each message.
+    dp = opendir(bdaddr_dirname);
+    while ((op = readdir(dp)) != NULL)
+    {
+        char *filename = NULL;
+        MessageFileInfo info = NULL;
+        if (strcmp(op->d_name, ".") == 0 || strcmp(op->d_name, "..") == 0)
+            continue;
+        filename = calloc(strlen(op->d_name) + strlen(bdaddr_dirname) + 2, sizeof(char));
+        strcpy(filename, bdaddr_dirname);
+        strcat(filename, "/");
+        strcat(filename, op->d_name);
+
+        info = loadMessageInfo(filename);
+        dumpMessageInfo(info, bdaddr);
+        freeMessageInfo(info);
+        free(filename);
+    }
+    closedir(dp);
+}
+
 void freeBluegraphChat(BluegraphChat chat)
 {
     if (!chat) return;

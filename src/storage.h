@@ -66,6 +66,7 @@ void writeMessageInfo(MessageFileInfo info, char *bdaddr_dirname);
 void freeMessageInfo(MessageFileInfo info);
 
 BluegraphChat loadBluegraphChat(char *bdaddr_dirname);
+void dumpChat(char *bdaddr_dirname);
 void freeBluegraphChat(BluegraphChat chat);
 
 BluegraphStorage bluegraph_load_storage();
