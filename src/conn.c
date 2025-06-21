@@ -131,7 +131,7 @@ void startServer(BluegraphStorage storage, char *bdaddr)
                     info->time = time(NULL);
                     info->direction = BLUEGRAPH_OUTGOING;
                     info->isText = true;
-                    info->info = buf;
+                    info->info = calloc(strlen(buf), 1);
                     filename = calloc(strlen(storage->dir) + 2 + 12, sizeof(char));
                     stringAddress2CompressedBDAddress(compressedBDAddr, bdaddr);
                     strcpy(filename, storage->dir);
