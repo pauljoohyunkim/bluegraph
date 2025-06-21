@@ -237,7 +237,7 @@ BluegraphStorage bluegraph_load_storage()
             free(filename);
             continue;
         }
-        printf("%s\n", filename);
+        //printf("%s\n", filename);
         addToFileList(storage->chatdirs, op->d_name);
         loadBluegraphChat(filename);
         free(filename);

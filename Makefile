@@ -1,6 +1,13 @@
 CC=gcc
 CFLAGS=-g -Wall
-LDFLAGS=-lbluetooth
+LDFLAGS=-lbluetooth -lncurses
+BIN=bluegraph
+
+bin: obj/bluegraph.o obj/conn.o obj/transaction.o obj/capsule.o obj/tui.o obj/storage.o
+	$(CC) $(CFLAGS) $^ -o bin/$(BIN) $(LDFLAGS)
+
+obj/%.o: src/%.c
+	$(CC) $(CFLAGS) -c $< -o $@ $(LDFLAGS)
 
 test/discoverytest: test/discoverytest.c src/conn.c
 	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
@@ -20,4 +27,6 @@ obj/%.o: src/%.c
 	$(CC) $(CFLAGS) -c $< -o $@ $(LDFLAGS)
 clean:
 	$(RM) test/*test
-	$(RM) -r obj/* bin/* ~/.bluegraph/*
+	$(RM) -r obj/* bin/*
+full-clean: clean
+	$(RM) ~/.bluegraph/*
