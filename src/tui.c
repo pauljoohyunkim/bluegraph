@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 #include <ncurses.h>
 #include "tui.h"
 
@@ -46,6 +47,26 @@ BluegraphWindow bluegraph_initialize_tui()
     wrefresh(windows->helpbar);
 
     return windows;
+}
+
+void loadRecipients(BluegraphWindow window, BluegraphStorage storage)
+{
+    window->nBdaddr = storage->chatdirs->size;
+    window->bdaddr = calloc(window->nBdaddr, sizeof(char *));
+    for (size_t i = 0; i < window->nBdaddr; i++)
+    {
+        window->bdaddr[i] = calloc(18, sizeof(char));
+        compressedBDAddress2StringAddress(window->bdaddr[i], storage->chatdirs->filenames[i]);
+    }
+}
+
+void freeRecipients(BluegraphWindow window)
+{
+    for (size_t i = 0; i < window->nBdaddr; i++)
+    {
+        free(window->bdaddr[i]);
+    }
+    free(window->bdaddr);
 }
 
 void bluegraph_end_tui(BluegraphWindow windows)

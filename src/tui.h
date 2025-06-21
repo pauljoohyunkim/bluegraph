@@ -2,6 +2,7 @@
 #define __TUI_H__
 
 #include <ncurses.h>
+#include "storage.h"
 
 // TUI : Recipient Selection Window, so a single window with a list of bdaddr,
 // and a single-row box for help.
@@ -23,15 +24,16 @@ typedef struct
     int y;
     int x;
     
-    char *bdaddr[18];
+    char **bdaddr;
     size_t nBdaddr;
-    size_t capacity;
     int startIndex;
 } BluegraphWindow_st;
 
 typedef BluegraphWindow_st *BluegraphWindow;
 
 BluegraphWindow bluegraph_initialize_tui();
+void loadRecipients(BluegraphWindow window, BluegraphStorage storage);
+void freeRecipients(BluegraphWindow window);
 void bluegraph_end_tui(BluegraphWindow windows);
 
 

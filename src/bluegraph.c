@@ -1,12 +1,20 @@
 #include <ncurses.h>
+#include "storage.h"
 #include "tui.h"
 
 int main()
 {
-	BluegraphWindow windows = NULL;
-	windows = bluegraph_initialize_tui();
+	BluegraphWindow window = NULL;
+	BluegraphStorage storage = NULL;
+	window = bluegraph_initialize_tui();
+	storage = bluegraph_load_storage();
+
+	// Load to windows
+	loadRecipients(window, storage);
 
 	getch();
-	bluegraph_end_tui(windows);
+	freeRecipients(window);
+	bluegraph_end_tui(window);
+	freeBluegraphStorage(storage);
 	return 0;
 }
