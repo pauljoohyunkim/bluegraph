@@ -107,7 +107,6 @@ int serverTransaction(int s, BluegraphStorage storage)
         default:
             break;
     }
-    printf("received [%s]\n", buf);
     free(bdaddr_dir);
     close(client);
     return status;
