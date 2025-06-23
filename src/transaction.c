@@ -24,6 +24,7 @@ int serverTransaction(int s, BluegraphStorage storage)
     int status = 0;
     int client = 0;
     uint8_t buf[BLUEGRAPH_CHUNK_SIZE] = { 0 };
+    char bdaddr[18] = { 0 };
     uint8_t compressedBDAddress[13] = { 0 };
     char *bdaddr_dir = NULL;
     Capsule clientCapsule = NULL;
@@ -34,13 +35,13 @@ int serverTransaction(int s, BluegraphStorage storage)
     int opt = sizeof(rem_addr);
 
     client = accept(s, (struct sockaddr *)&rem_addr, &opt);
-    ba2str(&rem_addr.rc_bdaddr, (char *) buf);
-    stringAddress2CompressedBDAddress(compressedBDAddress, buf);
+    ba2str(&rem_addr.rc_bdaddr, bdaddr);
+    stringAddress2CompressedBDAddress(compressedBDAddress, bdaddr);
     bdaddr_dir = calloc(strlen(storage->dir) + 2 + sizeof(compressedBDAddress), sizeof(char));
     strcpy(bdaddr_dir, storage->dir);
     strcat(bdaddr_dir, "/");
     strcat(bdaddr_dir, compressedBDAddress);
-    fprintf(stderr, "accepted connection from %s\n", buf);
+    fprintf(stderr, "accepted connection from %s\n", bdaddr);
     memset(buf, 0, sizeof(buf));
 
     status = read(client, buf, BLUEGRAPH_CHUNK_SIZE);
@@ -99,13 +100,13 @@ int serverTransaction(int s, BluegraphStorage storage)
             }
             memcpy(messageFileInfo->info, clientCapsule->send_message_data_info.msg, clientCapsule->send_message_request_info.msgLen);
             writeMessageInfo(messageFileInfo, bdaddr_dir);
+            dumpMessageInfo(messageFileInfo, bdaddr);
             freeCapsule(clientCapsule);
             freeMessageInfo(messageFileInfo);
             break;
         default:
             break;
     }
-    printf("received [%s]\n", buf);
     free(bdaddr_dir);
     close(client);
     return status;
