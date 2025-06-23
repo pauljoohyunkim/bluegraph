@@ -133,7 +133,7 @@ void startServer(BluegraphStorage storage)
                     clientConnect(bdaddr, transaction);
                     free(transaction);
                     
-                    printf("%s\n", buf);
+                    //printf("%s\n", buf);
 
                     memset(buf, 0, sizeof(buf));
                 }
